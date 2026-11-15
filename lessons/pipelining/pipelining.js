@@ -8,19 +8,16 @@
 
   var TEMPLATE = `
     <h2 class="lesson-title">Pipelining: Data Dependencies</h2>
-    <div class="split"><div class="col-a">
-    <p class="intro">A data dependency exists when an instruction needs a register that an earlier instruction writes. In a pipeline, the later instruction may reach the register-read stage before the value has been written, which is a data hazard.</p>
-
-    <div class="presets" data-o="qs" role="group" aria-label="Questions"></div>
-    <p class="prompt" data-o="prompt"></p>
-
-    <div class="bar">
+    <div class="lbar">
+      <div class="presets qs" data-o="qs" role="group" aria-label="Questions"></div>
       <div class="modes" role="group" aria-label="View">
         <button type="button" class="pb on" data-mode="solution" aria-pressed="true">Solution</button>
         <button type="button" class="pb" data-mode="practice" aria-pressed="false">Practice</button>
         <button type="button" class="pb tutbtn" data-tut aria-pressed="false">Tutorial</button>
       </div>
     </div>
+    <div class="split"><div class="col-a">
+    <p class="prompt" data-o="prompt"></p>
 
     <label class="f"><span class="fl">LC-3 code (you can edit it)</span>
       <textarea data-f="src" rows="10" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea></label>
@@ -83,6 +80,20 @@
 
     function F(name) { return el.querySelector('[data-f="' + name + '"]'); }
     function O(name) { return el.querySelector('[data-o="' + name + '"]'); }
+
+    // the code box grows with its text, so it never needs its own scrollbar
+    function fitBox() {
+      var ta = F('src');
+      if (!ta || !ta.offsetParent) return;
+      ta.style.height = '0px';
+      var cs = getComputedStyle(ta), bord = parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);
+      var bar = Math.max(0, ta.offsetHeight - ta.clientHeight - bord);    // a sideways scrollbar, if any
+      ta.style.height = (ta.scrollHeight + bord + bar) + 'px';
+    }
+    if (typeof ResizeObserver === 'function') {
+      var lastW = 0;
+      new ResizeObserver(function () { var w = F('src').clientWidth; if (w && w !== lastW) { lastW = w; fitBox(); } }).observe(F('src'));
+    }
 
     var S = {
       q: QS[0], src: '', mode: 'solution', tut: false, sel: -1,
@@ -278,7 +289,7 @@
     /* ---------- the whole page ---------- */
     function renderButtons() {
       O('qs').innerHTML = QS.map(function (q) {
-        return '<button type="button" class="pb' + (q.id === S.q.id ? ' on' : '') + '" data-q="' + q.id + '" aria-pressed="' + (q.id === S.q.id) + '">' + q.tab + '</button>';
+        return '<button type="button" class="pb qbtn' + (q.id === S.q.id ? ' on' : '') + '" data-q="' + q.id + '" aria-pressed="' + (q.id === S.q.id) + '">' + q.tab + '</button>';
       }).join('');
       O('prompt').textContent = S.q.title + '. ' + S.q.prompt;
     }
@@ -352,6 +363,7 @@
       S.q = QS.filter(function (q) { return q.id === id; })[0] || QS[0];
       S.src = S.q.source;
       F('src').value = S.src;
+      fitBox();
       S.sel = -1;
       update(true);
     }
@@ -370,7 +382,7 @@
 
     /* ---------- events (listening on this panel only) ---------- */
     el.addEventListener('input', function (e) {
-      if (e.target.getAttribute('data-f') === 'src') { S.src = e.target.value; update(true); }
+      if (e.target.getAttribute('data-f') === 'src') { S.src = e.target.value; fitBox(); update(true); }
     });
     el.addEventListener('change', function (e) {
       var t = e.target, field = t.getAttribute && t.getAttribute('data-pe');
@@ -410,7 +422,8 @@
     });
 
     loadQuestion(QS[0].id);
+    el._fitBox = fitBox;
   }
 
-  Lessons.register({ id: 'pipelining', title: 'Pipelining', mount: mount });
+  Lessons.register({ id: 'pipelining', title: 'Pipelining', mount: mount, onShow: function (el) { if (el._fitBox) el._fitBox(); } });
 })();

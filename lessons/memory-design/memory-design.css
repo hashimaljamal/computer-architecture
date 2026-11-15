@@ -68,3 +68,15 @@
 .lesson-memory .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 .lesson-memory .okmsg { color: var(--tacc); }
 .lesson-memory .bad { color: var(--tdan); }
+
+/* compact input cards */
+.lesson-memory .card { padding: 12px 14px; }
+.lesson-memory .ct { margin: 0 0 10px; }
+.lesson-memory .card .f { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 10px; margin: 0 0 8px; }
+.lesson-memory .card .fl { margin: 0; }
+.lesson-memory .ft { min-height: 0; }
+.lesson-memory .msg { min-height: 0; margin-top: 4px; }
+.lesson-memory .ft:empty, .lesson-memory .msg:empty, .lesson-memory [data-o="err"]:empty { display: none; }
+.lesson-memory .two { gap: 10px; }
+.lesson-memory .ctl input { width: 96px; }
+@media (max-width: 380px) { .lesson-memory .card .f { grid-template-columns: 1fr; } }

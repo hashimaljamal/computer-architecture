@@ -7,19 +7,20 @@
 
   var TEMPLATE = `
     <h2 class="lesson-title">Instruction Set Encoding</h2>
-    <div class="split"><div class="col-a">
-
-    <div class="presets" data-o="qs" role="group" aria-label="Questions"></div>
-    <p class="prompt" data-o="prompt"></p>
-
-    <div class="bar">
-      <label class="f"><span class="fl">Start address</span>
-        <span class="ctl"><input type="text" data-f="start" value="0x3000" spellcheck="false" autocomplete="off" inputmode="text"></span></label>
+    <div class="lbar">
+      <div class="presets qs" data-o="qs" role="group" aria-label="Questions"></div>
       <div class="modes" role="group" aria-label="View">
         <button type="button" class="pb on" data-mode="solution" aria-pressed="true">Solution</button>
         <button type="button" class="pb" data-mode="practice" aria-pressed="false">Practice</button>
         <button type="button" class="pb tutbtn" data-tut aria-pressed="false">Tutorial</button>
       </div>
+    </div>
+    <div class="split"><div class="col-a">
+    <p class="prompt" data-o="prompt"></p>
+
+    <div class="bar">
+      <label class="f"><span class="fl">Start address</span>
+        <span class="ctl"><input type="text" data-f="start" value="0x3000" spellcheck="false" autocomplete="off" inputmode="text"></span></label>
     </div>
 
     <label class="f"><span class="fl">LC-3 assembly (you can edit it)</span>
@@ -118,6 +119,20 @@
     function F(name) { return el.querySelector('[data-f="' + name + '"]'); }
     function O(name) { return el.querySelector('[data-o="' + name + '"]'); }
 
+    // the code box grows with its text, so it never needs its own scrollbar
+    function fitBox() {
+      var ta = F('src');
+      if (!ta || !ta.offsetParent) return;
+      ta.style.height = '0px';
+      var cs = getComputedStyle(ta), bord = parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);
+      var bar = Math.max(0, ta.offsetHeight - ta.clientHeight - bord);    // a sideways scrollbar, if any
+      ta.style.height = (ta.scrollHeight + bord + bar) + 'px';
+    }
+    if (typeof ResizeObserver === 'function') {
+      var lastW = 0;
+      new ResizeObserver(function () { var w = F('src').clientWidth; if (w && w !== lastW) { lastW = w; fitBox(); } }).observe(F('src'));
+    }
+
     var S = { q: QS[0], src: '', start: '', mode: 'solution', tut: false, sel: 0, res: null, cmp: null, matches: false, prac: {}, checked: false };
 
     /* ---------- assembling ---------- */
@@ -141,7 +156,7 @@
     /* ---------- pieces of the page ---------- */
     function renderButtons() {
       O('qs').innerHTML = QS.map(function (q) {
-        return '<button type="button" class="pb' + (q.id === S.q.id ? ' on' : '') + '" data-q="' + q.id + '" aria-pressed="' + (q.id === S.q.id) + '">' + q.tab + '</button>';
+        return '<button type="button" class="pb qbtn' + (q.id === S.q.id ? ' on' : '') + '" data-q="' + q.id + '" aria-pressed="' + (q.id === S.q.id) + '">' + q.tab + '</button>';
       }).join('');
       O('prompt').textContent = S.q.title + '. ' + S.q.prompt;
     }
@@ -328,6 +343,7 @@
       S.src = S.q.source;
       S.start = LC3.hex4(S.q.start);
       F('src').value = S.src;
+      fitBox();
       F('start').value = S.start;
       S.sel = 0;
       update(true);
@@ -402,7 +418,7 @@
     /* ---------- events (listening on this panel only) ---------- */
     el.addEventListener('input', function (e) {
       var t = e.target, f = t.getAttribute('data-f'), pi = t.getAttribute('data-pi');
-      if (f === 'src') { S.src = t.value; update(true); }
+      if (f === 'src') { S.src = t.value; fitBox(); update(true); }
       else if (f === 'start') { S.start = t.value; update(true); }
       else if (pi) {
         var i = +t.getAttribute('data-row'), p = prac(i);
@@ -444,7 +460,8 @@
 
     O('ref').innerHTML = referenceHtml();
     loadQuestion(QS[0].id);
+    el._fitBox = fitBox;
   }
 
-  Lessons.register({ id: 'lc3-encoding', title: 'Instruction Set Encoding', mount: mount });
+  Lessons.register({ id: 'lc3-encoding', title: 'Instruction Set Encoding', mount: mount, onShow: function (el) { if (el._fitBox) el._fitBox(); } });
 })();

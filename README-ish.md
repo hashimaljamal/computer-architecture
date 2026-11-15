@@ -86,9 +86,13 @@ Each lesson has a **Tutorial** button next to Solution and Practice. It walks th
 
 ### LC-3 instruction formats
 
-The format chart is a pull-out on the right edge of the Instruction Set Encoding tab. Click **LC-3 instruction formats** (or the floating button on phones) to slide it out; all 20 formats fit without scrolling on a normal screen. Press Esc, Close or click outside to put it away.
+The format chart is a thin pull-out on the right edge of the Instruction Set Encoding tab. Click **LC-3 instruction formats** to open it: on computers and tablets the page narrows to make room, so the code, table and chart are all visible at once; on phones (the floating button) it slides over the page. All 20 formats fit without scrolling. Press Esc or Close to put it away.
+
+The LC-3 and Pipelining code boxes grow with the code you type, so they never need their own scrollbar.
 
 ### Look and layout
+
+- Every tab has the same bar at the top: categories (Memory only), then the questions, then **Solution / Practice / Tutorial** on the right. The selected question is filled in so it stands out.
 
 - **Light mode**: white page and white blocks separated by clear borders. **Dark mode**: deep black page with dark gray blocks. Every text colour was checked to be at least 4.5:1 against its background in both modes.
 - The layout adapts from phones (about 320 px) to wide desktops. Big screens put inputs on the left and results on the right; narrow screens stack into one column. Buttons and boxes grow on touch screens, and wide tables and diagrams scroll sideways inside their own frame instead of breaking the page.

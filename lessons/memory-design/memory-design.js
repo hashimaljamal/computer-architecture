@@ -7,11 +7,23 @@
 
   var TEMPLATE = `
     <h2 class="lesson-title">Memory System Designer</h2>
-    <div class="mbar">
+    <div class="lbar">
       <div class="seg" role="group" aria-label="Problem type">
-        <button type="button" class="pb on" data-view="design">RAM chips</button>
-        <button type="button" class="pb" data-view="blocks">Block address map</button>
-        <button type="button" class="pb" data-view="bus">Bus and address width</button>
+        <button type="button" class="pb qbtn on" data-view="design">RAM chips</button>
+        <button type="button" class="pb qbtn" data-view="blocks">Block address map</button>
+        <button type="button" class="pb qbtn" data-view="bus">Bus and address width</button>
+      </div>
+      <span class="sep" aria-hidden="true"></span>
+      <div class="presets qs" data-o="qs-design">
+      <button type="button" class="pb qbtn" data-q="ex1">Ex 1: 2 MB, 32-bit</button>
+      <button type="button" class="pb qbtn" data-q="ex2">Ex 2: 64 KB, 16-bit</button>
+      <button type="button" class="pb qbtn" data-q="ex3">Ex 3: 128 KB, 32-bit</button>
+      <button type="button" class="pb qbtn" data-q="ex4">Ex 4: 1 MB, 32-bit</button>
+    </div>
+      <div class="presets qs" hidden data-o="qs-blocks"><button type="button" class="pb qbtn" data-q="ex5">Ex 5: 32 MB, 16-bit, 4 blocks</button></div>
+      <div class="presets qs" hidden data-o="qs-bus">
+        <button type="button" class="pb qbtn" data-q="ex6">Ex 6: 1 GB, 26 address lines</button>
+        <button type="button" class="pb qbtn" data-q="ex7">Ex 7: 512 KB, 32-bit bus</button>
       </div>
       <div class="modes" role="group" aria-label="View">
         <button type="button" class="pb on" data-mode="solution" aria-pressed="true">Solution</button>
@@ -21,12 +33,6 @@
     </div>
 
     <div class="split" data-v="design"><div class="col-a">
-    <div class="presets" data-o="qs-design">
-      <button type="button" class="pb" data-q="ex1">Ex 1: 2 MB, 32-bit</button>
-      <button type="button" class="pb" data-q="ex2">Ex 2: 64 KB, 16-bit</button>
-      <button type="button" class="pb" data-q="ex3">Ex 3: 128 KB, 32-bit</button>
-      <button type="button" class="pb" data-q="ex4">Ex 4: 1 MB, 32-bit</button>
-    </div>
     <p class="prompt" data-only="prompt" data-o="prompt-design"></p>
 
     <div data-only="solin">
@@ -88,7 +94,6 @@
     </div></div>
 
     <div class="split" data-v="blocks" hidden><div class="col-a">
-      <div class="presets" data-o="qs-blocks"><button type="button" class="pb" data-q="ex5">Ex 5: 32 MB, 16-bit, 4 blocks</button></div>
       <p class="prompt" data-only="prompt" data-o="prompt-blocks"></p>
       <div data-only="solin">
       <section class="card">
@@ -107,10 +112,6 @@
     </div></div>
 
     <div class="split" data-v="bus" hidden><div class="col-a">
-      <div class="presets" data-o="qs-bus">
-        <button type="button" class="pb" data-q="ex6">Ex 6: 1 GB, 26 address lines</button>
-        <button type="button" class="pb" data-q="ex7">Ex 7: 512 KB, 32-bit bus</button>
-      </div>
       <p class="prompt" data-only="prompt" data-o="prompt-bus"></p>
       <div data-only="solin">
       <section class="card">
@@ -277,6 +278,7 @@
       Array.prototype.forEach.call(el.querySelectorAll('[data-view]'), function (b) {
         b.classList.toggle('on', b.getAttribute('data-view') === v);
       });
+      ['design', 'blocks', 'bus'].forEach(function (k) { O('qs-' + k).hidden = k !== v; });
       refreshActive();
     }
 

@@ -111,3 +111,6 @@
 
 .lesson-pipe .tutbtn.on { border-color: var(--ba); }
 .lesson-pipe section[hidden] { display: none; }
+
+/* the code box grows with its text (see fitBox) */
+.lesson-pipe textarea { min-height: 0; height: auto; resize: none; overflow-y: hidden; overflow-x: auto; }

@@ -12,19 +12,17 @@
 
   var TEMPLATE = `
     <h2 class="lesson-title">Cache: Address Format</h2>
-    <div class="split"><div class="col-a">
-    <p class="intro">A cache splits every main memory address into three fields: the <b>tag</b>, the <b>index</b> (which set to look in) and the <b>byte offset</b> (which byte of the line). Memory is taken to be byte-addressable.</p>
-
-    <div class="presets" data-o="qs" role="group" aria-label="Questions"></div>
-    <p class="prompt" data-o="prompt"></p>
-
-    <div class="bar">
+    <div class="lbar">
+      <div class="presets qs" data-o="qs" role="group" aria-label="Questions"></div>
       <div class="modes" role="group" aria-label="View">
         <button type="button" class="pb on" data-mode="solution" aria-pressed="true">Solution</button>
         <button type="button" class="pb" data-mode="practice" aria-pressed="false">Practice</button>
         <button type="button" class="pb tutbtn" data-tut aria-pressed="false">Tutorial</button>
       </div>
     </div>
+    <div class="split"><div class="col-a">
+    <p class="intro">A cache splits every main memory address into three fields: the <b>tag</b>, the <b>index</b> (which set to look in) and the <b>byte offset</b> (which byte of the line). Memory is taken to be byte-addressable.</p>
+    <p class="prompt" data-o="prompt"></p>
 
     <section data-view="solution">
       <div class="grid">
@@ -382,7 +380,7 @@
     });
 
     O('qs').innerHTML = QS.map(function (q) {
-      return '<button type="button" class="pb" data-q="' + q.id + '" aria-pressed="false">' + q.tab + '</button>';
+      return '<button type="button" class="pb qbtn" data-q="' + q.id + '" aria-pressed="false">' + q.tab + '</button>';
     }).join('');
     loadQuestion(QS[0].id);
   }

@@ -76,6 +76,7 @@ p { margin: 0; }
   display: flex;
   gap: 2px;
   overflow-x: auto;
+  overflow-y: hidden;
   border-bottom: 1px solid var(--bd);
   margin: 0 0 18px;
   scrollbar-width: thin;
@@ -87,13 +88,14 @@ button.tab {
   border-bottom: 2px solid transparent;
   border-radius: 0;
   padding: 9px 14px;
-  margin-bottom: -0.5px;
+  margin-bottom: -1px;
   color: var(--tsec);
   white-space: nowrap;
 }
 button.tab:hover { background: var(--hl); color: var(--tpri); }
 button.tab[aria-selected="true"] { color: var(--tpri); font-weight: 500; border-bottom-color: var(--ba); }
-button.tab:focus-visible { outline-offset: -2px; }
+button.tab:focus { outline: none; }
+button.tab:focus-visible { outline: 2px solid var(--ba); outline-offset: -4px; border-radius: 6px; }
 .panel[hidden] { display: none; }
 
 /* ---------- controls (shared by every lesson) ---------- */
@@ -243,4 +245,68 @@ button.tab { scroll-snap-align: start; }
 @media print {
   .topbar, .tabs, button { display: none !important; }
   html, body { height: auto; overflow: visible; }
+}
+
+
+/* ---------- the bar at the top of every lesson ----------
+ * [categories] | [questions]  ............  [Solution] [Practice] [Tutorial] */
+.panel .lbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 0 0 12px; }
+.panel .lbar .presets, .panel .lbar .seg { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+.panel .lbar .presets[hidden] { display: none; }
+.panel .lbar .modes { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.panel .lbar .sep { width: 1px; align-self: stretch; min-height: 28px; background: var(--bs); margin: 0 4px; }
+.panel .lbar .pb { font-size: 14px; padding: 6px 14px; }
+
+/* questions and categories: bold, and the chosen one is filled */
+.pb.qbtn { font-weight: 600; letter-spacing: .01em; }
+.pb.qbtn.on, .pb.qbtn.on:hover { background: var(--tacc); color: var(--bg); border-color: var(--tacc); }
+.panel .lbar .modes .pb.on { background: var(--hl); border-color: var(--ba); font-weight: 600; }
+
+@media (max-width: 600px) {
+  .panel .lbar { gap: 6px; }
+  .panel .lbar .sep { display: none; }
+  .panel .lbar .modes { margin-left: 0; width: 100%; }
+  .panel .lbar .modes .pb { flex: 1; }
+  .panel .lbar .pb { padding: 6px 11px; }
+}
+
+/* wide screens: title, tabs and theme button share one row */
+@media (min-width: 1280px) and (min-height: 560px) {
+  .app { grid-template-columns: auto 1fr auto; grid-template-areas: "title tabs top" "panels panels panels"; grid-template-rows: auto minmax(0, 1fr); column-gap: 28px; }
+  .tabs { margin: 0; border-bottom: none; align-self: end; }
+  .title { align-self: center; }
+  #panels { padding-top: 12px; border-top: 1px solid var(--bd); }
+}
+
+/* mid-size screens: keep the lesson bar on one line */
+@media (min-width: 900px) and (max-width: 1500px) {
+  .panel .lbar { gap: 6px 8px; }
+  .panel .lbar .pb { font-size: 13px; padding: 5px 10px; }
+  .panel .lbar .sep { margin: 0 2px; }
+}
+
+/* the selected tab already names the lesson, so the in-panel heading is not needed */
+.panel > .lesson-title { display: none; }
+
+/* phones: one compact header row, tabs wrap instead of hiding off-screen */
+@media (max-width: 600px) {
+  .app { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "title top" "tabs tabs" "panels panels"; align-items: center; padding-top: 10px; }
+  .topbar { grid-area: top; margin: 0; }
+  .topbar .pb { font-size: 12px; padding: 4px 9px; }
+  .title { grid-area: title; text-align: left; margin: 0; }
+  .title h1 { font-size: 16px; line-height: 1.25; }
+  .by { font-size: 12px; margin: 0; }
+  .tabs { grid-area: tabs; flex-wrap: wrap; overflow: visible; margin: 8px 0 12px; gap: 0; }
+  button.tab { flex: 1 1 45%; text-align: center; padding: 8px 6px; }
+  #panels { grid-area: panels; min-width: 0; }
+}
+
+@media (max-width: 600px) {
+  .panel .enc { font-size: 12px; }
+  .panel .enc th, .panel .enc td { padding-left: 6px !important; padding-right: 6px !important; }
+}
+
+@media (max-width: 600px) {
+  .panel .lbar .seg { width: 100%; flex-wrap: nowrap; }
+  .panel .lbar .seg .pb { flex: 1 1 auto; font-size: 12px; padding: 6px 5px; }
 }
