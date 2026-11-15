@@ -34,6 +34,14 @@
 .lesson-memory .maprow { display: flex; gap: 12px; font-size: 13px; margin: 0 0 4px; }
 .lesson-memory .cs { width: 44px; font-weight: 500; color: var(--tacc); }
 
+/* working and block map */
+.lesson-memory .blk { margin: 0 0 12px; }
+.lesson-memory .blk .f { margin-bottom: 4px; }
+.lesson-memory .wk { margin: 0 0 8px; padding-left: 20px; line-height: 1.7; font-size: 13px; }
+.lesson-memory .bt { border-collapse: collapse; font-size: 13px; width: 100%; }
+.lesson-memory .bt th, .lesson-memory .bt td { text-align: left; padding: 4px 10px; border-bottom: 0.5px solid var(--bd); font-family: ui-monospace, Menlo, Consolas, monospace; }
+.lesson-memory .bt th { font-family: inherit; color: var(--tsec); font-weight: 500; }
+
 @media (prefers-reduced-motion: reduce) {
   .lesson-memory .out { transition: none; }
 }
