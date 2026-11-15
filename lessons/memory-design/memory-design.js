@@ -7,16 +7,19 @@
 
   var TEMPLATE = `
     <h2 class="lesson-title">Memory System Designer</h2>
-    <div class="split"><div class="col-a">
+    <div class="seg" role="group" aria-label="Problem type">
+      <button type="button" class="pb on" data-view="design">RAM chips</button>
+      <button type="button" class="pb" data-view="blocks">Block address map</button>
+      <button type="button" class="pb" data-view="bus">Bus and address width</button>
+    </div>
+
+    <div class="split" data-v="design"><div class="col-a">
 
     <div class="presets">
       <button type="button" class="pb" data-preset="18,16,2,MB,32">Ex 1: 2 MB, 32-bit</button>
       <button type="button" class="pb" data-preset="12,16,64,KB,16">Ex 2: 64 KB, 16-bit</button>
       <button type="button" class="pb" data-preset="14,8,128,KB,32">Ex 3: 128 KB, 32-bit</button>
       <button type="button" class="pb" data-preset="17,8,1,MB,32">Ex 4: 1 MB, 32-bit</button>
-      <button type="button" class="pb" data-ex5>Ex 5: 32 MB in 4 blocks</button>
-      <button type="button" class="pb" data-pbus="1,GB,p,26">Ex 6: 1 GB, 26 address lines</button>
-      <button type="button" class="pb" data-pbus="512,KB,bus,32">Ex 7: 512 KB, 32-bit bus</button>
     </div>
 
     <div class="two">
@@ -53,18 +56,10 @@
       </section>
     </div>
 
-    <section class="card blk">
-      <h3 class="ct">Block address map</h3>
-      <label class="f"><span class="fl">Number of blocks (power of 2)</span>
-        <span class="ctl"><input type="number" data-f="blocks" value="4" min="1" max="256"></span></label>
-      <p class="ft">Uses the processor address lines above.</p>
-    </section>
-
     <p class="hint">In each box, enter any two values and the third is calculated. Press Clear boxes to start fresh.</p>
     <p class="err" data-o="err" role="alert"></p>
 
     </div><div class="col-b">
-    <div class="bw" data-o="bw"></div>
     <div class="out" data-o="out">
       <div class="mets" data-o="mets"></div>
       <p class="cap legend">
@@ -77,8 +72,41 @@
       <p class="cap">Address map</p>
       <div class="map" data-o="map"></div>
     </div>
-    <div class="bm" data-o="bm"></div>
     </div></div>
+
+    <div class="split" data-v="blocks" hidden><div class="col-a">
+      <div class="presets"><button type="button" class="pb" data-ex5>Ex 5: 32 MB, 16-bit, 4 blocks</button></div>
+      <section class="card">
+        <h3 class="ct">Memory blocks</h3>
+        <label class="f"><span class="fl">Processor address lines</span>
+          <span class="ctl"><input type="number" data-f="bp" value="24" min="1" max="40"></span></label>
+        <label class="f"><span class="fl">Number of blocks (power of 2)</span>
+          <span class="ctl"><input type="number" data-f="blocks" value="4" min="1" max="256"></span></label>
+        <p class="ft">The top address lines choose the block through a decoder; AS drives its enable.</p>
+      </section>
+    </div><div class="col-b" data-o="bm"></div></div>
+
+    <div class="split" data-v="bus" hidden><div class="col-a">
+      <div class="presets">
+        <button type="button" class="pb" data-ex6>Ex 6: 1 GB, 26 address lines</button>
+        <button type="button" class="pb" data-ex7>Ex 7: 512 KB, 32-bit bus</button>
+      </div>
+      <section class="card">
+        <h3 class="ct">Memory</h3>
+        <label class="f"><span class="fl">Memory size</span>
+          <span class="ctl">
+            <input type="number" data-f="bsz" data-bg value="1" min="0" step="any">
+            <select data-f="bu" aria-label="Unit for memory size"><option>B</option><option>KB</option><option>MB</option><option selected>GB</option></select>
+          </span></label>
+        <label class="f"><span class="fl">Data bus (bits)</span>
+          <span class="ctl"><input type="number" data-f="bbus" data-bg value="" min="1"></span></label>
+        <label class="f"><span class="fl">Address lines</span>
+          <span class="ctl"><input type="number" data-f="baw" data-bg value="26" min="1"></span></label>
+        <div class="center"><button type="button" class="pb" data-bclear>Clear boxes</button></div>
+        <p class="msg" data-o="bmsg" aria-live="polite"></p>
+      </section>
+      <p class="hint">Enter any two values and the third is calculated.</p>
+    </div><div class="col-b" data-o="bw"></div></div>
   `;
 
   function mount(el) {
@@ -136,43 +164,9 @@
       else { m.textContent = ''; m.className = 'msg'; }
     }
 
-    /* ---------- bus / address-width working and block map ---------- */
-    function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
-
-    function renderWorking() {
-      var box = O('bw');
-      if (solver.isBlank('P') || solver.ERR.P) { box.innerHTML = ''; return; }
-      var s = +F('sz').value, u = F('u').value, b = +F('bus').value, p = +F('p').value;
-      if (!(s > 0) || !(b >= 1) || !(p >= 1)) { box.innerHTML = ''; return; }
-      box.innerHTML = '<p class="cap">Data bus and address width</p><ol class="wk">' +
-        B.working(s, u, b, p).lines.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ol>';
-    }
-
-    function renderBlocks() {
-      var box = O('bm');
-      if (solver.isBlank('P') || solver.ERR.P) { box.innerHTML = ''; return; }
-      var m = B.blockMap(+F('p').value, parseInt(F('blocks').value, 10));
-      if (!m.ok) { box.innerHTML = '<p class="cap">Block address map</p><p class="err">' + esc(m.error) + '</p>'; return; }
-      var h = '<p class="cap">Block address map: ' + (m.k
-        ? 'select lines <b>' + m.selLines + '</b> go to a ' + m.k + 'x' + m.blocks + ' decoder (AS to EN, active-low outputs). '
-        : 'one block, so no decoder. ') +
-        'Each block holds 2^' + (m.P - m.k) + ' = ' + m.blockWords.toLocaleString() + ' words and uses <b>' + m.blockLines + '</b>.</p>' +
-        '<div class="scroll"><table class="bt"><thead><tr><th>Block</th><th>Select</th><th>First</th><th>Last</th><th>Chip select</th></tr></thead><tbody>';
-      m.rows.forEach(function (r) {
-        h += '<tr><td>Block' + r.i + '</td><td>' + (r.sel || '-') + '</td><td>' + r.firstHex + '</td><td>' + r.lastHex + '</td><td>' + r.cs + '</td></tr>';
-      });
-      h += '</tbody></table></div>';
-      var d = B.diagram(m);
-      h += d ? '<svg viewBox="0 0 ' + d.W + ' ' + d.H + '" width="100%" style="display:block;max-width:' + d.W + 'px;margin:8px auto 0" role="img"><title>Decoder selecting memory blocks</title>' + d.body + '</svg>'
-             : '<p class="muted small">The decoder diagram is drawn for up to 16 blocks.</p>';
-      box.innerHTML = h;
-    }
-
     /* ---------- render everything ---------- */
     function render() {
       clearTimeout(drawTimer);
-      renderWorking();
-      renderBlocks();
       var blankR = solver.isBlank('R'), blankP = solver.isBlank('P');
       showMsg('R', 'msgR', blankR);
       showMsg('P', 'msgP', blankP);
@@ -223,31 +217,117 @@
       O('map').innerHTML = html;
     }
 
+    /* ---------- views ---------- */
+    function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+
+    function showView(v) {
+      Array.prototype.forEach.call(el.querySelectorAll('[data-v]'), function (x) { x.hidden = x.getAttribute('data-v') !== v; });
+      Array.prototype.forEach.call(el.querySelectorAll('[data-view]'), function (b) {
+        b.classList.toggle('on', b.getAttribute('data-view') === v);
+      });
+    }
+
+    /* ---------- block address map ---------- */
+    function renderBlocks() {
+      var box = O('bm');
+      var m = B.blockMap(parseInt(F('bp').value, 10), parseInt(F('blocks').value, 10));
+      if (!m.ok) { box.innerHTML = '<p class="err">' + esc(m.error) + '</p>'; return; }
+      var h = '<p class="cap">' + (m.k
+        ? 'Select lines <b>' + m.selLines + '</b> go to a ' + m.k + 'x' + m.blocks + ' decoder (AS to EN, active-low outputs). '
+        : 'One block, so no decoder. ') +
+        'Each block holds 2^' + (m.P - m.k) + ' = ' + m.blockWords.toLocaleString() + ' words and uses <b>' + m.blockLines + '</b>.</p>';
+      var d = B.diagram(m);
+      if (d) h += '<svg viewBox="0 0 ' + d.W + ' ' + d.H + '" width="100%" style="display:block;max-width:' + d.W + 'px;margin:0 auto 12px" role="img"><title>Decoder selecting memory blocks</title>' + d.body + '</svg>';
+      else h += '<p class="muted small">The decoder diagram is drawn for up to 16 blocks.</p>';
+      h += '<div class="scroll"><table class="bt"><thead><tr><th>Block</th><th>Select</th><th>First</th><th>Last</th><th>Chip select</th></tr></thead><tbody>';
+      m.rows.forEach(function (r) {
+        h += '<tr><td>Block' + r.i + '</td><td>' + (r.sel || '-') + '</td><td>' + r.firstHex + '</td><td>' + r.lastHex + '</td><td>' + r.cs + '</td></tr>';
+      });
+      box.innerHTML = h + '</tbody></table></div>';
+    }
+
+    /* ---------- bus and address width: enter any two of three ---------- */
+    var bOrder = ['bsz', 'baw'], bPrevUnit = 'GB';
+
+    function bShow(msg, isErr) { var m = O('bmsg'); m.textContent = msg; m.className = isErr ? 'msg err' : 'msg'; }
+
+    function bCompute() {
+      var out = O('bw'), derived = ['bsz', 'bbus', 'baw'].filter(function (x) { return bOrder.indexOf(x) < 0; });
+      if (bOrder.length < 2) {
+        out.innerHTML = '';
+        bShow('Enter any two values and the third is calculated.', false);
+        return;
+      }
+      var u = F('bu').value, v = {}, ok = true;
+      bOrder.forEach(function (x) { v[x] = +F(x).value; if (!(v[x] > 0)) ok = false; });
+      if (!ok) { out.innerHTML = ''; bShow('Enter positive numbers.', true); return; }
+      var d = derived[0], r;
+      if (d === 'bsz') {
+        var bytes = Math.pow(2, v.baw) * v.bbus / 8;
+        if (!(Number.isInteger(v.baw) && Number.isInteger(v.bbus))) { out.innerHTML = ''; bShow('Address lines and data bus must be whole numbers.', true); return; }
+        u = L.pickUnit(bytes);
+        F('bu').value = u; bPrevUnit = u;
+        F('bsz').value = L.rnd(bytes / L.MULT[u]);
+        r = B.solve(+F('bsz').value, u, v.bbus, null);
+        if (!r.ok || r.P !== v.baw) r = { ok: true, bus: v.bbus, P: v.baw, lines: B.working(+F('bsz').value, u, v.bbus, v.baw).lines };
+      } else if (d === 'bbus') {
+        r = B.solve(v.bsz, u, null, v.baw);
+        if (r.ok) F('bbus').value = r.bus;
+      } else {
+        r = B.solve(v.bsz, u, v.bbus, null);
+        if (r.ok) F('baw').value = r.P;
+      }
+      if (!r.ok) { out.innerHTML = ''; bShow(r.error, true); return; }
+      bShow('', false);
+      out.innerHTML = '<p class="cap"><b>' + r.bus + '-bit data bus, ' + r.P + ' address lines.</b></p><ol class="wk">' +
+        r.lines.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ol>';
+    }
+
+    function bTouch(id) {
+      if (F(id).value === '') { bOrder = bOrder.filter(function (x) { return x !== id; }); }
+      else { bOrder = bOrder.filter(function (x) { return x !== id; }).concat(id); if (bOrder.length > 2) bOrder.shift(); }
+      bCompute();
+    }
+
+    function bUnit() {
+      var u = F('bu').value;
+      if (bOrder.length === 2 && bOrder.indexOf('bsz') < 0 && F('bsz').value !== '') {
+        // size is calculated: same quantity in the new unit
+        var bytes = +F('bsz').value * L.MULT[bPrevUnit];
+        F('bsz').value = L.rnd(bytes / L.MULT[u]); bPrevUnit = u; bCompute();
+      } else { bPrevUnit = u; if (F('bsz').value !== '') bTouch('bsz'); else bCompute(); }
+    }
+
+    function bSet(sz, u, id, val) {
+      F('bsz').value = sz; F('bu').value = u; bPrevUnit = u;
+      F('bbus').value = ''; F('baw').value = '';
+      F(id).value = val;
+      bOrder = ['bsz', id];
+      bCompute();
+    }
+
     /* ---------- events (listening on this panel only) ---------- */
     el.addEventListener('input', function (e) {
-      if (e.target.getAttribute('data-f') === 'blocks') { renderBlocks(); return; }
+      var f = e.target.getAttribute('data-f');
+      if (f === 'bp' || f === 'blocks') { renderBlocks(); return; }
+      if (e.target.hasAttribute('data-bg')) { bTouch(f); return; }
       var g = e.target.getAttribute('data-g');
       if (g) solver.touch(g, e.target.getAttribute('data-f'));
     });
     el.addEventListener('change', function (e) {
+      if (e.target.getAttribute('data-f') === 'bu') { bUnit(); return; }
       var g = e.target.getAttribute('data-unit');
       if (g) solver.unitChg(g);
     });
     el.addEventListener('click', function (e) {
-      var t = e.target.closest('[data-preset],[data-clear],[data-zoom],[data-ex5],[data-pbus]');
+      var t = e.target.closest('[data-preset],[data-clear],[data-zoom],[data-view],[data-ex5],[data-ex6],[data-ex7],[data-bclear]');
       if (!t) return;
-      if (t.hasAttribute('data-ex5')) {
-        F('blocks').value = 4;
-        solver.preset(18, 16, 32, 'MB', 16);       // 32 MB, 16-bit data -> 24 address lines
-      } else if (t.hasAttribute('data-pbus')) {
-        // size + one of (address lines, bus) typed in the Processor box; the other is calculated
-        var q = t.getAttribute('data-pbus').split(',');
-        solver.clearG('P');
-        F('sz').value = q[0]; F('u').value = q[1];
-        solver.unitChg('P');
-        F(q[2]).value = q[3];
-        solver.touch('P', q[2]);
-      } else if (t.hasAttribute('data-preset')) {
+      if (t.hasAttribute('data-view')) { showView(t.getAttribute('data-view')); }
+      else if (t.hasAttribute('data-ex5')) { F('bp').value = 24; F('blocks').value = 4; renderBlocks(); }
+      else if (t.hasAttribute('data-ex6')) { bSet(1, 'GB', 'baw', 26); }
+      else if (t.hasAttribute('data-ex7')) { bSet(512, 'KB', 'bbus', 32); }
+      else if (t.hasAttribute('data-bclear')) { F('bsz').value = F('bbus').value = F('baw').value = ''; bOrder = []; bCompute(); }
+      else if (t.hasAttribute('data-preset')) {
         var a = t.getAttribute('data-preset').split(',');
         solver.preset(+a[0], +a[1], +a[2], a[3], +a[4]);
       } else if (t.hasAttribute('data-clear')) {
@@ -260,6 +340,8 @@
     });
 
     solver.preset(18, 16, 2, 'MB', 32);
+    renderBlocks();
+    bCompute();
   }
 
   Lessons.register({ id: 'memory-design', title: 'Memory System Design', mount: mount });
