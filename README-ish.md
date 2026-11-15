@@ -25,7 +25,7 @@ Each box has three linked values. **Enter any two and the third is calculated.**
 - The two boxes you edited most recently are the inputs. The other one is calculated.
 - **Clear boxes** empties a box so you can enter two fresh values.
 - Changing the unit on a *calculated* size converts the number. On a size you *entered*, it changes the quantity.
-- **Ex 1 to Ex 4** load the four worked examples.
+- **Ex 1 to Ex 4** load the four worked examples; **Ex 5** is the block address map and **Ex 6 / Ex 7** are the bus and address-width problems (see below).
 - The schematic draws up to 64 rows × 64 columns. Big designs appear in a scrollable frame with zoom buttons.
 
 How the design works:
@@ -69,6 +69,30 @@ How the design works:
 - **Practice** hides the answers and gives you a box for each one. **Check answers** marks each box and gives a hint for the wrong ones, **Show answers** fills them in, and **Clear** starts over.
 - Main memory is taken to be byte-addressable, and sizes must be powers of 2.
 
+### Tutorial mode (every lesson)
+
+Each lesson has a **Tutorial** button next to Solution and Practice. It walks through the method one step at a time for the question that is loaded (or for whatever you typed in the boxes):
+
+- **Solution** mode: each step explains the idea and shows its answer. Use Next and Back to move, or click a finished step to go back to it.
+- **Practice** mode: you type the answer for each step. Check marks it (with a hint if wrong) and Next unlocks once it is right, or press Show answer.
+- Memory: separate tutorials for RAM chips, the block address map, and bus / address width. LC-3: pick any instruction from the list and encode it field by field. Pipelining: reads and writes, then each instruction's dependencies. Cache: lines, sets, offset, index and tag bits, then the set and block of the address.
+- The engine is `tutorial.js`; a lesson only supplies a list of steps (see the header comment in that file).
+
+### Memory system design: Solution, Practice, three problem types
+
+- Switch the problem type at the top: **RAM chips** (Ex 1 to 4), **Block address map** (Ex 5), **Bus and address width** (Ex 6, 7).
+- **Solution** shows the working and drawings. **Practice** hides them and gives boxes for each answer (address lines, rows, columns, ICs, decoder, hex addresses, and so on) with Check, Show answers and Clear.
+- In *Bus and address width* enter any two of size, data bus and address lines and the third is calculated, with the written working.
+
+### LC-3 instruction formats
+
+The format chart is a pull-out on the right edge of the Instruction Set Encoding tab. Click **LC-3 instruction formats** (or the floating button on phones) to slide it out; all 20 formats fit without scrolling on a normal screen. Press Esc, Close or click outside to put it away.
+
+### Look and layout
+
+- **Light mode**: white page and white blocks separated by clear borders. **Dark mode**: deep black page with dark gray blocks. Every text colour was checked to be at least 4.5:1 against its background in both modes.
+- The layout adapts from phones (about 320 px) to wide desktops. Big screens put inputs on the left and results on the right; narrow screens stack into one column. Buttons and boxes grow on touch screens, and wide tables and diagrams scroll sideways inside their own frame instead of breaking the page.
+
 ## Using the site
 
 - On a big screen (at least 900 px wide and 560 px tall) the page fits the window: each lesson has its inputs on the left and its results on the right, and each side scrolls on its own if it is long. On phones and small windows the two sides stack into one normal scrolling page.
@@ -102,12 +126,15 @@ Rules that keep lessons from clashing (the template repeats them):
 index.html                     page shell and the list of lessons
 style.css                      colours, page, tabs, and shared controls
 shell.js                       tabs, theme toggle, lesson registry
+tutorial.js                    the step-by-step tutorial engine used by every lesson
 lessons/
   memory-design/
     memory-design.js           the lesson's page (builds its panel)
     memory-design.css          the lesson's styles
     logic.js                   the "enter any two values" math (no page code)
     schematic.js               builds the SVG schematic (no page code)
+    blocks.js                  block address map, decoder drawing, bus / address-width working (no page code)
+    memory-questions.js        Ex 1 to Ex 7, their practice boxes and tutorials (no page code)
   lc3-encoding/
     lc3-encoding.js            the lesson's page (builds its panel)
     lc3-encoding.css           the lesson's styles
@@ -127,6 +154,9 @@ lessons/
   _template/                   copy this to start a new lesson
 tests/
   harness.js                   tiny test helper
+  tutorial.test.js             tests for answer checking in the tutorial engine
+  memory-blocks.test.js        tests for the block map and bus / address-width math
+  memory-questions.test.js     tests for Ex 1 to Ex 7 answers and tutorials
   memory-design.test.js        tests for the Memory design lesson
   lc3-encoding.test.js         tests for the LC-3 encoding lesson
   pipelining.test.js           tests for the Pipelining lesson

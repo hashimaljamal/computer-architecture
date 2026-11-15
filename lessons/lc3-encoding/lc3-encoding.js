@@ -18,6 +18,7 @@
       <div class="modes" role="group" aria-label="View">
         <button type="button" class="pb on" data-mode="solution" aria-pressed="true">Solution</button>
         <button type="button" class="pb" data-mode="practice" aria-pressed="false">Practice</button>
+        <button type="button" class="pb tutbtn" data-tut aria-pressed="false">Tutorial</button>
       </div>
     </div>
 
@@ -26,6 +27,11 @@
     <ul class="errs" data-o="errs" role="alert"></ul>
 
     </div><div class="col-b">
+    <div class="tutwrap" data-o="tutwrap" hidden>
+      <label class="f"><span class="fl">Instruction to encode</span><select data-o="tsel"></select></label>
+      <div data-o="tut"></div>
+    </div>
+    <div data-o="main">
     <div class="tablewrap">
       <table class="enc">
         <thead><tr><th>Address</th><th>Instruction</th><th>Binary</th><th>Hex</th><th data-o="th5"></th></tr></thead>
@@ -44,11 +50,15 @@
 
     <section class="explain" data-o="explain" aria-live="polite"></section>
 
-    <details class="ref">
-      <summary>LC-3 instruction formats</summary>
-      <div data-o="ref"></div>
-    </details>
+    </div>
     </div></div>
+
+    <button type="button" class="reftab" data-o="reftab" aria-expanded="false" aria-controls="lc3-ref">LC-3 instruction formats</button>
+    <div class="refback" data-o="refback" hidden></div>
+    <aside class="refdrawer" id="lc3-ref" data-o="refdrawer" aria-label="LC-3 instruction formats" hidden>
+      <div class="rh"><b>LC-3 instruction formats</b><button type="button" class="pb" data-o="refclose">Close \u2715</button></div>
+      <div data-o="ref"></div>
+    </aside>
   `;
 
   function esc(s) {
@@ -108,7 +118,7 @@
     function F(name) { return el.querySelector('[data-f="' + name + '"]'); }
     function O(name) { return el.querySelector('[data-o="' + name + '"]'); }
 
-    var S = { q: QS[0], src: '', start: '', mode: 'solution', sel: 0, res: null, cmp: null, matches: false, prac: {}, checked: false };
+    var S = { q: QS[0], src: '', start: '', mode: 'solution', tut: false, sel: 0, res: null, cmp: null, matches: false, prac: {}, checked: false };
 
     /* ---------- assembling ---------- */
     function startValue() {
@@ -253,7 +263,52 @@
       box.innerHTML = h;
     }
 
+    /* ---------- tutorial: encode one instruction ---------- */
+    function tutorialSteps() {
+      var w = S.res.words[S.sel];
+      if (!w || w.word === null) return [];
+      var steps = [{ title: 'The instruction', body:
+        '<p>Encode <b class="mono">' + esc(w.text || '(data)') + '</b> at address <span class="mono">' + LC3.hex4(w.addr) + '</span>.</p>' +
+        '<p>Every LC-3 instruction is <b>16 bits</b>. The top 4 bits are the opcode; the rest hold registers, immediates or offsets. We build it left to right, then turn the 16 bits into 4 hex digits.</p>' }];
+      if (w.segs.length) {
+        w.segs.forEach(function (sg) {
+          var name = sg.name || 'fixed bits';
+          steps.push({ title: name, type: 'bin', value: sg.bits, answer: sg.bits,
+            body: '<p>' + esc(sg.note || (sg.kind === 'fix' ? 'Always ' + sg.bits + ' for this instruction.' : '')) + '</p>',
+            ask: 'Bits for ' + name + ' (' + sg.bits.length + ' bit' + (sg.bits.length > 1 ? 's' : '') + ')?',
+            hint: sg.kind === 'reg' ? 'A register number is written in 3-bit binary: R0 = 000, R1 = 001, \u2026 R7 = 111.' : sg.kind === 'imm' ? 'Write the value in two\u2019s complement using exactly ' + sg.bits.length + ' bits.' : 'Use exactly ' + sg.bits.length + ' bits.' });
+        });
+        steps.push({ title: 'Join the fields', type: 'bin', value: w.bits, answer: LC3.group4(w.bits),
+          body: fieldGrid(w.segs.map(function (sg) { return { text: sg.bits, sub: sg.name, w: sg.bits.length, kind: sg.kind }; }), true) + legend() +
+            '<p>Put the fields side by side, bit 15 on the left.</p>',
+          ask: 'All 16 bits?', hint: 'Write the fields in order with no gaps; spaces are ignored.' });
+      } else {
+        steps.push({ title: 'This is data', body: '<p>' + esc(w.note || 'This word is stored as written.') + '</p>' });
+      }
+      var nib = '<div class="nibs">';
+      for (var k = 0; k < 4; k++) { var g = w.bits.slice(k * 4, k * 4 + 4); nib += '<div><span class="mono">' + g + '</span><b class="mono">' + parseInt(g, 2).toString(16).toUpperCase() + '</b></div>'; }
+      nib += '<div class="eq mono">= ' + w.hex + '</div></div>';
+      steps.push({ title: 'Hexadecimal', type: 'hex', value: parseInt(w.bits, 2), answer: w.hex,
+        body: '<p>Split the 16 bits into four groups of 4 (nibbles) and convert each to one hex digit.</p>' + nib,
+        ask: 'The hex value?', hint: 'Each group of 4 bits is one hex digit (1010 = A, 1111 = F).' });
+      return steps;
+    }
+    var tut = Tutorial.mount(O('tut'), { steps: tutorialSteps, mode: function () { return S.mode; }, empty: 'Fix the errors in the assembly to see the steps.' });
+
+    function renderTutSelect() {
+      var sel = O('tsel'), words = S.res.words;
+      sel.innerHTML = words.map(function (w, i) {
+        return '<option value="' + i + '"' + (i === S.sel ? ' selected' : '') + (w.word === null ? ' disabled' : '') + '>' + LC3.hex4(w.addr) + '  ' + esc(w.text || '(data)') + '</option>';
+      }).join('');
+    }
+    function renderTutorial() {
+      O('tutwrap').hidden = !S.tut;
+      O('main').hidden = S.tut;
+      if (S.tut) { renderTutSelect(); tut.refresh(); }
+    }
+
     function renderAll() {
+      renderTutorial();
       renderButtons();
       renderErrors();
       renderTable();
@@ -286,6 +341,20 @@
         b.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
       renderAll();
+    }
+    function setTut(on) {
+      S.tut = on;
+      var b = el.querySelector('[data-tut]');
+      b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on));
+      renderAll();
+    }
+
+    /* the format reference slides in from the right */
+    function openRef(on) {
+      O('refdrawer').hidden = !on; O('refback').hidden = !on;
+      O('reftab').setAttribute('aria-expanded', String(on));
+      el.classList.toggle('ref-open', on);
+      if (on) O('refclose').focus(); else O('reftab').focus();
     }
 
     function select(i) {
@@ -344,10 +413,11 @@
       }
     });
     el.addEventListener('click', function (e) {
-      var t = e.target.closest('[data-q],[data-mode],[data-row],[data-act]');
+      var t = e.target.closest('[data-q],[data-mode],[data-row],[data-act],[data-tut]');
       if (!t || t.tagName === 'INPUT') return;
       if (t.hasAttribute('data-q')) loadQuestion(t.getAttribute('data-q'));
       else if (t.hasAttribute('data-mode')) setMode(t.getAttribute('data-mode'));
+      else if (t.hasAttribute('data-tut')) setTut(!S.tut);
       else if (t.hasAttribute('data-act')) {
         var a = t.getAttribute('data-act');
         if (a === 'check') checkAll();
@@ -363,6 +433,14 @@
         if (i !== S.sel) select(i);
       }
     });
+
+    el.addEventListener('change', function (e) {
+      if (e.target === O('tsel')) { S.sel = +e.target.value; tut.reset(); }
+    });
+    O('reftab').addEventListener('click', function () { openRef(true); });
+    O('refclose').addEventListener('click', function () { openRef(false); });
+    O('refback').addEventListener('click', function () { openRef(false); });
+    el.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !O('refdrawer').hidden) openRef(false); });
 
     O('ref').innerHTML = referenceHtml();
     loadQuestion(QS[0].id);

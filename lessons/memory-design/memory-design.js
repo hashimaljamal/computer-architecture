@@ -7,21 +7,29 @@
 
   var TEMPLATE = `
     <h2 class="lesson-title">Memory System Designer</h2>
-    <div class="seg" role="group" aria-label="Problem type">
-      <button type="button" class="pb on" data-view="design">RAM chips</button>
-      <button type="button" class="pb" data-view="blocks">Block address map</button>
-      <button type="button" class="pb" data-view="bus">Bus and address width</button>
+    <div class="mbar">
+      <div class="seg" role="group" aria-label="Problem type">
+        <button type="button" class="pb on" data-view="design">RAM chips</button>
+        <button type="button" class="pb" data-view="blocks">Block address map</button>
+        <button type="button" class="pb" data-view="bus">Bus and address width</button>
+      </div>
+      <div class="modes" role="group" aria-label="View">
+        <button type="button" class="pb on" data-mode="solution" aria-pressed="true">Solution</button>
+        <button type="button" class="pb" data-mode="practice" aria-pressed="false">Practice</button>
+        <button type="button" class="pb tutbtn" data-tut aria-pressed="false">Tutorial</button>
+      </div>
     </div>
 
     <div class="split" data-v="design"><div class="col-a">
-
-    <div class="presets">
-      <button type="button" class="pb" data-preset="18,16,2,MB,32">Ex 1: 2 MB, 32-bit</button>
-      <button type="button" class="pb" data-preset="12,16,64,KB,16">Ex 2: 64 KB, 16-bit</button>
-      <button type="button" class="pb" data-preset="14,8,128,KB,32">Ex 3: 128 KB, 32-bit</button>
-      <button type="button" class="pb" data-preset="17,8,1,MB,32">Ex 4: 1 MB, 32-bit</button>
+    <div class="presets" data-o="qs-design">
+      <button type="button" class="pb" data-q="ex1">Ex 1: 2 MB, 32-bit</button>
+      <button type="button" class="pb" data-q="ex2">Ex 2: 64 KB, 16-bit</button>
+      <button type="button" class="pb" data-q="ex3">Ex 3: 128 KB, 32-bit</button>
+      <button type="button" class="pb" data-q="ex4">Ex 4: 1 MB, 32-bit</button>
     </div>
+    <p class="prompt" data-only="prompt" data-o="prompt-design"></p>
 
+    <div data-only="solin">
     <div class="two">
       <section class="card">
         <h3 class="ct">RAM memory</h3>
@@ -58,8 +66,10 @@
 
     <p class="hint">In each box, enter any two values and the third is calculated. Press Clear boxes to start fresh.</p>
     <p class="err" data-o="err" role="alert"></p>
+    </div>
 
     </div><div class="col-b">
+    <div data-only="solres">
     <div class="out" data-o="out">
       <div class="mets" data-o="mets"></div>
       <p class="cap legend">
@@ -72,10 +82,15 @@
       <p class="cap">Address map</p>
       <div class="map" data-o="map"></div>
     </div>
+    </div>
+    <div data-only="pracres" data-o="pr-design"></div>
+    <div data-only="tutres" data-o="tu-design"></div>
     </div></div>
 
     <div class="split" data-v="blocks" hidden><div class="col-a">
-      <div class="presets"><button type="button" class="pb" data-ex5>Ex 5: 32 MB, 16-bit, 4 blocks</button></div>
+      <div class="presets" data-o="qs-blocks"><button type="button" class="pb" data-q="ex5">Ex 5: 32 MB, 16-bit, 4 blocks</button></div>
+      <p class="prompt" data-only="prompt" data-o="prompt-blocks"></p>
+      <div data-only="solin">
       <section class="card">
         <h3 class="ct">Memory blocks</h3>
         <label class="f"><span class="fl">Processor address lines</span>
@@ -84,13 +99,20 @@
           <span class="ctl"><input type="number" data-f="blocks" value="4" min="1" max="256"></span></label>
         <p class="ft">The top address lines choose the block through a decoder; AS drives its enable.</p>
       </section>
-    </div><div class="col-b" data-o="bm"></div></div>
+      </div>
+    </div><div class="col-b">
+      <div data-only="solres" data-o="bm"></div>
+      <div data-only="pracres" data-o="pr-blocks"></div>
+      <div data-only="tutres" data-o="tu-blocks"></div>
+    </div></div>
 
     <div class="split" data-v="bus" hidden><div class="col-a">
-      <div class="presets">
-        <button type="button" class="pb" data-ex6>Ex 6: 1 GB, 26 address lines</button>
-        <button type="button" class="pb" data-ex7>Ex 7: 512 KB, 32-bit bus</button>
+      <div class="presets" data-o="qs-bus">
+        <button type="button" class="pb" data-q="ex6">Ex 6: 1 GB, 26 address lines</button>
+        <button type="button" class="pb" data-q="ex7">Ex 7: 512 KB, 32-bit bus</button>
       </div>
+      <p class="prompt" data-only="prompt" data-o="prompt-bus"></p>
+      <div data-only="solin">
       <section class="card">
         <h3 class="ct">Memory</h3>
         <label class="f"><span class="fl">Memory size</span>
@@ -106,11 +128,17 @@
         <p class="msg" data-o="bmsg" aria-live="polite"></p>
       </section>
       <p class="hint">Enter any two values and the third is calculated.</p>
-    </div><div class="col-b" data-o="bw"></div></div>
+      </div>
+    </div><div class="col-b">
+      <div data-only="solres" data-o="bw"></div>
+      <div data-only="pracres" data-o="pr-bus"></div>
+      <div data-only="tutres" data-o="tu-bus"></div>
+    </div></div>
   `;
 
+
   function mount(el) {
-    var L = MemLogic, S = Schematic, B = MemBlocks, rng = L.rng;
+    var L = MemLogic, S = Schematic, B = MemBlocks, MQ = MemQuestions, rng = L.rng;
     el.classList.add('lesson-memory');
     el.innerHTML = TEMPLATE;
 
@@ -220,12 +248,107 @@
     /* ---------- views ---------- */
     function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
 
+    /* ---------- modes, views and questions ---------- */
+    var ST = { view: 'design', mode: 'solution', tut: false, cur: { design: 'ex1', blocks: 'ex5', bus: 'ex6' }, pv: { design: {}, blocks: {}, bus: {} } };
+    var tuts = {};
+
+    function qOf(id) { return MQ.QUESTIONS.filter(function (q) { return q.id === id; })[0]; }
+
+    function applyClasses() {
+      el.classList.toggle('m-practice', ST.mode === 'practice');
+      el.classList.toggle('m-solution', ST.mode === 'solution');
+      el.classList.toggle('t-on', ST.tut);
+      Array.prototype.forEach.call(el.querySelectorAll('[data-mode]'), function (b) {
+        var on = b.getAttribute('data-mode') === ST.mode;
+        b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on));
+      });
+      var tb = el.querySelector('[data-tut]');
+      tb.classList.toggle('on', ST.tut); tb.setAttribute('aria-pressed', String(ST.tut));
+    }
+
+    function refreshActive() {
+      renderPractice(ST.view);
+      if (ST.tut && tuts[ST.view]) tuts[ST.view].refresh();
+    }
+
     function showView(v) {
+      ST.view = v;
       Array.prototype.forEach.call(el.querySelectorAll('[data-v]'), function (x) { x.hidden = x.getAttribute('data-v') !== v; });
       Array.prototype.forEach.call(el.querySelectorAll('[data-view]'), function (b) {
         b.classList.toggle('on', b.getAttribute('data-view') === v);
       });
+      refreshActive();
     }
+
+    function setMode(m) { ST.mode = m; applyClasses(); refreshActive(); }
+    function setTut(on) { ST.tut = on; applyClasses(); refreshActive(); }
+
+    function loadQuestion(id) {
+      var q = qOf(id);
+      if (!q) return;
+      ST.cur[q.type] = id; ST.pv[q.type] = {};
+      var f = MQ.facts(q);
+      if (q.type === 'design') solver.preset(q.m, q.w, q.size, q.unit, q.bus);
+      else if (q.type === 'blocks') { F('bp').value = f.P; F('blocks').value = q.blocks; renderBlocks(); }
+      else bSet(q.size, q.unit, q.P ? 'baw' : 'bbus', q.P || q.bus);
+      O('prompt-' + q.type).textContent = MQ.prompt(q);
+      Array.prototype.forEach.call(O('qs-' + q.type).querySelectorAll('[data-q]'), function (b) {
+        b.classList.toggle('on', b.getAttribute('data-q') === id);
+      });
+      if (q.type === ST.view) refreshActive();
+    }
+
+    /* ---------- practice boxes ---------- */
+    function renderPractice(view) {
+      var q = qOf(ST.cur[view]), fields = MQ.practiceFields(q), vals = ST.pv[view], groups = [], h = '';
+      fields.forEach(function (f) { if (groups.indexOf(f.group) < 0) groups.push(f.group); });
+      h += '<p class="muted small">Work it out on paper, then type your answers. Check answers marks each box and gives a hint for the wrong ones. Hex answers can be written with or without 0x.</p>';
+      groups.forEach(function (g) {
+        h += '<fieldset class="pgroup"><legend>' + esc(g) + '</legend><div class="prow">';
+        fields.filter(function (f) { return f.group === g; }).forEach(function (f) {
+          h += '<label class="pf"><span class="fl">' + esc(f.label) + '</span><input type="text" class="mono" data-pv="' + f.id + '" value="' + esc(vals[f.id] || '') +
+            '" autocomplete="off" spellcheck="false"><span class="pm" data-pm="' + f.id + '" aria-live="polite"></span></label>';
+        });
+        h += '</div></fieldset>';
+      });
+      h += '<div class="pactions"><button type="button" class="pb" data-act="check">Check answers</button><button type="button" class="pb" data-act="reveal">Show answers</button>' +
+        '<button type="button" class="pb" data-act="clear">Clear</button><span class="muted" data-o="score-' + view + '" aria-live="polite"></span></div>';
+      O('pr-' + view).innerHTML = h;
+    }
+
+    function practiceAct(act) {
+      var view = ST.view, q = qOf(ST.cur[view]), fields = MQ.practiceFields(q), vals = ST.pv[view], right = 0, box = O('pr-' + view);
+      if (act === 'clear') { ST.pv[view] = {}; renderPractice(view); return; }
+      fields.forEach(function (f) {
+        var inp = box.querySelector('[data-pv="' + f.id + '"]'), m = box.querySelector('[data-pm="' + f.id + '"]');
+        if (act === 'reveal') { vals[f.id] = f.answer; inp.value = f.answer; }
+        var ok = Tutorial.check(f, inp.value);
+        if (ok) right++;
+        m.innerHTML = ok ? '<span class="okmsg">✓</span>' : '<span class="bad">✗ ' + (inp.value.trim() ? '' : 'Empty. ') + esc(f.hint) + '</span>';
+      });
+      O('score-' + view).textContent = act === 'reveal' ? 'Answers shown' : right + ' of ' + fields.length + ' correct';
+    }
+
+    /* ---------- tutorials ---------- */
+    function designTutorial() {
+      if (ST.mode === 'practice') return MQ.designSteps(qOf(ST.cur.design));
+      if (solver.isBlank('R') || solver.isBlank('P') || solver.ERR.R || solver.ERR.P) return [];
+      return MQ.designSteps({ m: +F('m').value, w: +F('w').value, size: +F('sz').value, unit: F('u').value, bus: +F('bus').value });
+    }
+    function blocksTutorial() {
+      if (ST.mode === 'practice') { var q = qOf(ST.cur.blocks); return MQ.blocksSteps({ P: MQ.facts(q).P, blocks: q.blocks }); }
+      return MQ.blocksSteps({ P: parseInt(F('bp').value, 10), blocks: parseInt(F('blocks').value, 10) });
+    }
+    function busTutorial() {
+      if (ST.mode === 'practice') { var q = qOf(ST.cur.bus); return MQ.busSteps({ size: q.size, unit: q.unit, bus: q.bus || null, P: q.P || null }); }
+      var size = +F('bsz').value, unit = F('bu').value, useBus = bOrder.indexOf('bbus') >= 0 && bOrder.indexOf('baw') < 0;
+      if (!(size > 0) || bOrder.length < 2) return [];
+      return MQ.busSteps({ size: size, unit: unit, bus: useBus ? +F('bbus').value : null, P: useBus ? null : +F('baw').value });
+    }
+    var EMPTY = 'Enter valid values in the boxes, or load an example, to see the steps.';
+    tuts.design = Tutorial.mount(O('tu-design'), { steps: designTutorial, mode: function () { return ST.mode; }, empty: EMPTY });
+    tuts.blocks = Tutorial.mount(O('tu-blocks'), { steps: blocksTutorial, mode: function () { return ST.mode; }, empty: EMPTY });
+    tuts.bus = Tutorial.mount(O('tu-bus'), { steps: busTutorial, mode: function () { return ST.mode; }, empty: EMPTY });
 
     /* ---------- block address map ---------- */
     function renderBlocks() {
@@ -308,6 +431,8 @@
 
     /* ---------- events (listening on this panel only) ---------- */
     el.addEventListener('input', function (e) {
+      var pv = e.target.getAttribute('data-pv');
+      if (pv) { ST.pv[ST.view][pv] = e.target.value; var pm = e.target.parentNode.querySelector('.pm'); if (pm) pm.innerHTML = ''; return; }
       var f = e.target.getAttribute('data-f');
       if (f === 'bp' || f === 'blocks') { renderBlocks(); return; }
       if (e.target.hasAttribute('data-bg')) { bTouch(f); return; }
@@ -320,17 +445,15 @@
       if (g) solver.unitChg(g);
     });
     el.addEventListener('click', function (e) {
-      var t = e.target.closest('[data-preset],[data-clear],[data-zoom],[data-view],[data-ex5],[data-ex6],[data-ex7],[data-bclear]');
+      var t = e.target.closest('[data-clear],[data-zoom],[data-view],[data-q],[data-mode],[data-tut],[data-act],[data-bclear]');
       if (!t) return;
       if (t.hasAttribute('data-view')) { showView(t.getAttribute('data-view')); }
-      else if (t.hasAttribute('data-ex5')) { F('bp').value = 24; F('blocks').value = 4; renderBlocks(); }
-      else if (t.hasAttribute('data-ex6')) { bSet(1, 'GB', 'baw', 26); }
-      else if (t.hasAttribute('data-ex7')) { bSet(512, 'KB', 'bbus', 32); }
+      else if (t.hasAttribute('data-q')) { loadQuestion(t.getAttribute('data-q')); }
+      else if (t.hasAttribute('data-mode')) { setMode(t.getAttribute('data-mode')); }
+      else if (t.hasAttribute('data-tut')) { setTut(!ST.tut); }
+      else if (t.hasAttribute('data-act')) { practiceAct(t.getAttribute('data-act')); }
       else if (t.hasAttribute('data-bclear')) { F('bsz').value = F('bbus').value = F('baw').value = ''; bOrder = []; bCompute(); }
-      else if (t.hasAttribute('data-preset')) {
-        var a = t.getAttribute('data-preset').split(',');
-        solver.preset(+a[0], +a[1], +a[2], a[3], +a[4]);
-      } else if (t.hasAttribute('data-clear')) {
+      else if (t.hasAttribute('data-clear')) {
         solver.clearG(t.getAttribute('data-clear'));
       } else if (t.hasAttribute('data-zoom')) {
         var z = t.getAttribute('data-zoom');
@@ -339,7 +462,19 @@
       }
     });
 
-    solver.preset(18, 16, 2, 'MB', 32);
+    // keep an open tutorial in step with edits to the boxes
+    function afterEdit(e) {
+      if (!ST.tut || (e.target.hasAttribute && (e.target.hasAttribute('data-tv') || e.target.hasAttribute('data-pv')))) return;
+      if (e.target.closest && e.target.closest('[data-only="solin"]')) tuts[ST.view].refresh();
+    }
+    el.addEventListener('input', afterEdit);
+    el.addEventListener('change', afterEdit);
+    el.addEventListener('click', function (e) {
+      if (ST.tut && e.target.closest && e.target.closest('[data-clear],[data-bclear]')) tuts[ST.view].refresh();
+    });
+
+    applyClasses();
+    loadQuestion('ex5'); loadQuestion('ex6'); loadQuestion('ex1');
     renderBlocks();
     bCompute();
   }

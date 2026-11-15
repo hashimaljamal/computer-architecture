@@ -10,6 +10,8 @@
 .lesson-cache .bar { display: flex; justify-content: flex-end; margin: 0 0 10px; }
 .lesson-cache .modes { display: flex; gap: 6px; }
 .lesson-cache section[hidden] { display: none; }
+.lesson-cache.t-on .col-b section[data-view], .lesson-cache.t-on .ref { display: none; }
+.lesson-cache .tutbtn.on { border-color: var(--ba); }
 
 /* inputs */
 .lesson-cache .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 4px 12px; margin: 0 0 4px; }
@@ -25,9 +27,9 @@
 
 /* working and the address bar */
 .lesson-cache .steps { margin: 6px 0 12px; padding: 0 0 0 20px; font-size: 13px; line-height: 1.7; }
-.lesson-cache .fmt { display: flex; gap: 0; margin: 8px 0 4px; border: 0.5px solid var(--bs); border-radius: 8px; overflow: hidden; }
+.lesson-cache .fmt { display: flex; gap: 0; margin: 8px 0 4px; border: 1px solid var(--bs); border-radius: 8px; overflow: hidden; }
 .lesson-cache .seg { flex: 1 1 0; min-width: 64px; text-align: center; padding: 8px 4px 6px; border-top: 3px solid; }
-.lesson-cache .seg + .seg { border-left: 0.5px solid var(--bs); }
+.lesson-cache .seg + .seg { border-left: 1px solid var(--bs); }
 .lesson-cache .seg b { display: block; font-size: 18px; font-weight: 500; }
 .lesson-cache .seg span { font-size: 12px; color: var(--tsec); }
 .lesson-cache .f-tag { border-color: var(--wm); }
@@ -51,7 +53,7 @@
 .lesson-cache .calc { margin: 0 0 8px; padding: 0 0 0 18px; font-size: 13px; line-height: 1.7; }
 
 /* practice */
-.lesson-cache .pgroup { border: 0.5px solid var(--bd); border-radius: 8px; margin: 0 0 12px; padding: 6px 12px 10px; }
+.lesson-cache .pgroup { border: 1px solid var(--bd); border-radius: 8px; margin: 0 0 12px; padding: 6px 12px 10px; }
 .lesson-cache .pgroup legend { font-size: 13px; color: var(--tsec); padding: 0 6px; }
 .lesson-cache .prow { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 14px; }
 .lesson-cache .pf input { width: 100%; }

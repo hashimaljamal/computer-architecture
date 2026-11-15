@@ -18,6 +18,7 @@
       <div class="modes" role="group" aria-label="View">
         <button type="button" class="pb on" data-mode="solution" aria-pressed="true">Solution</button>
         <button type="button" class="pb" data-mode="practice" aria-pressed="false">Practice</button>
+        <button type="button" class="pb tutbtn" data-tut aria-pressed="false">Tutorial</button>
       </div>
     </div>
 
@@ -36,6 +37,8 @@
     </div><div class="col-b">
     <div data-o="diagram"></div>
     <p class="legend muted small" data-o="legend"></p>
+
+    <section data-o="tutwrap" hidden><div data-o="tut"></div></section>
 
     <section data-o="solution">
       <div class="keybox" data-o="key"></div>
@@ -82,7 +85,7 @@
     function O(name) { return el.querySelector('[data-o="' + name + '"]'); }
 
     var S = {
-      q: QS[0], src: '', mode: 'solution', sel: -1,
+      q: QS[0], src: '', mode: 'solution', tut: false, sel: -1,
       parsed: null, ana: null, cmp: null, matches: false,
       entries: [{ dep: '', src: '', reg: '' }], rows: null, shown: false
     };
@@ -280,10 +283,47 @@
       O('prompt').textContent = S.q.title + '. ' + S.q.prompt;
     }
 
+    /* ---------- tutorial: find the dependencies one instruction at a time ---------- */
+    function tutorialSteps() {
+      var insts = S.parsed.insts;
+      if (!insts.length || S.parsed.errors.length || insts.some(function (it) { return it.err; })) return [];
+      function text(n) { var it = insts.filter(function (x) { return x.n === n; })[0]; return it ? it.text : ''; }
+      var steps = [{ title: 'What each instruction reads and writes', body:
+        '<p>A dependency exists when an instruction <b>reads</b> a register that an earlier instruction <b>writes</b>. First note both for every instruction. ADD, AND, NOT, LD, LDI and LDR also write the <i>status register</i>; a branch reads it.</p>' +
+        '<ul class="mono">' + insts.map(function (it) {
+          return '<li>' + it.n + '. ' + esc(it.text) + ' \u2014 reads ' + (it.reads.concat(it.readsStatus ? ['status'] : []).join(', ') || 'nothing') +
+            '; writes ' + (it.writes.concat(it.setsStatus ? ['status'] : []).join(', ') || 'nothing') + '</li>';
+        }).join('') + '</ul>' }];
+      var byDep = {};
+      S.ana.deps.forEach(function (d) { (byDep[d.dep] = byDep[d.dep] || []).push(d); });
+      insts.forEach(function (it) {
+        var list = byDep[it.n];
+        if (!list) return;
+        var srcs = list.map(function (d) { return String(d.src); }).filter(function (x, i, a) { return a.indexOf(x) === i; });
+        steps.push({ title: 'Instruction ' + it.n + ': ' + it.text, type: 'set', value: srcs,
+          answer: list.map(function (d) { return d.src + ' (' + (d.reg === 'SR' ? 'status register' : d.reg) + ')'; }).filter(function (x, i, a) { return a.indexOf(x) === i; }).join(', '),
+          body: '<p><b>' + esc(it.text) + '</b> reads ' + (it.reads.concat(it.readsStatus ? ['the status register'] : []).join(', ') || 'nothing') +
+            '. For each one, look back up the code for the <b>nearest</b> earlier instruction that writes it.' +
+            (list.some(function (d) { return d.carried; }) ? ' In a loop, a value with no earlier writer comes from the previous pass: the last write in the loop.' : '') +
+            (list.some(function (d) { return d.kind === 'control'; }) ? ' A branch target also depends on the branch that leads to it.' : '') + '</p>',
+          ask: 'Which instruction number(s) does instruction ' + it.n + ' depend on?', hint: 'Type the instruction numbers, separated by commas, for example 1, 4.' });
+      });
+      steps.push({ title: 'All the dependencies', body: S.ana.deps.length
+        ? '<ul>' + S.ana.deps.map(function (d) { return '<li>' + esc(Deps.sentence(d)) + (d.carried ? ' (loop-carried)' : d.kind === 'control' ? ' (control)' : '') + '</li>'; }).join('') + '</ul>'
+        : '<p>No dependencies found.</p>' });
+      return steps;
+    }
+    var tut = Tutorial.mount(O('tut'), { steps: tutorialSteps, mode: function () { return S.mode; }, empty: 'Fix the errors in the code to see the steps.' });
+
     function renderMode() {
       var practice = S.mode === 'practice';
-      O('solution').hidden = practice;
-      O('practice').hidden = !practice;
+      O('solution').hidden = practice || S.tut;
+      O('practice').hidden = !practice || S.tut;
+      O('tutwrap').hidden = !S.tut;
+      el.querySelector('.ref').hidden = S.tut;
+      var tb = el.querySelector('[data-tut]');
+      tb.classList.toggle('on', S.tut); tb.setAttribute('aria-pressed', String(S.tut));
+      if (S.tut) tut.refresh();
       el.querySelectorAll('[data-mode]').forEach(function (b) {
         var on = b.getAttribute('data-mode') === S.mode;
         b.classList.toggle('on', on);
@@ -344,10 +384,11 @@
       renderDiagram();
     });
     el.addEventListener('click', function (e) {
-      var t = e.target.closest('[data-q],[data-mode],[data-row],[data-act],[data-rm]');
+      var t = e.target.closest('[data-q],[data-mode],[data-row],[data-act],[data-rm],[data-tut]');
       if (!t) return;
       if (t.hasAttribute('data-q')) loadQuestion(t.getAttribute('data-q'));
       else if (t.hasAttribute('data-mode')) { S.mode = t.getAttribute('data-mode'); renderMode(); renderDiagram(); }
+      else if (t.hasAttribute('data-tut')) { S.tut = !S.tut; renderMode(); }
       else if (t.hasAttribute('data-row')) toggleRow(+t.getAttribute('data-row'));
       else if (t.hasAttribute('data-rm')) {
         S.entries.splice(+t.getAttribute('data-rm'), 1);

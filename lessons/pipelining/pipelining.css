@@ -27,12 +27,12 @@
 .lesson-pipe .errs .note { color: var(--tsec); }
 
 /* instruction table and dependency list */
-.lesson-pipe .tablewrap { overflow-x: auto; margin: 0 0 8px; border: 0.5px solid var(--bd); border-radius: 8px; }
+.lesson-pipe .tablewrap { overflow-x: auto; margin: 0 0 8px; border: 1px solid var(--bd); border-radius: 8px; }
 .lesson-pipe .enc { width: 100%; border-collapse: collapse; font-size: 13px; }
-.lesson-pipe .enc th { text-align: left; font-weight: 500; color: var(--tsec); padding: 7px 10px; border-bottom: 0.5px solid var(--bd); white-space: nowrap; }
-.lesson-pipe .enc td { padding: 4px 10px; border-bottom: 0.5px solid var(--bd); vertical-align: middle; white-space: nowrap; }
+.lesson-pipe .enc th { text-align: left; font-weight: 500; color: var(--tsec); padding: 7px 10px; border-bottom: 1px solid var(--bd); white-space: nowrap; }
+.lesson-pipe .enc td { padding: 4px 10px; border-bottom: 1px solid var(--bd); vertical-align: middle; white-space: nowrap; }
 .lesson-pipe .enc tr:last-child td { border-bottom: none; }
-.lesson-pipe .enc tr.sel td { background: var(--s1); }
+.lesson-pipe .enc tr.sel td { background: var(--hl); }
 .lesson-pipe .enc td.bad { color: var(--tdan); white-space: normal; }
 .lesson-pipe .lbl { color: var(--tacc); margin-right: 6px; }
 .lesson-pipe .rowbtn { background: none; border: none; padding: 3px 5px; margin: -3px 0 -3px -5px; text-align: left; font-size: 13px; color: var(--tpri); cursor: pointer; border-radius: 4px; }
@@ -54,9 +54,9 @@
 /* the arrow diagram */
 .lesson-pipe .diagwrap { margin: 4px 0 6px; }
 .lesson-pipe .diag { display: block; width: 100%; height: auto; margin: 0 auto; overflow: visible; }
-.lesson-pipe .diag .rb { fill: var(--s2); stroke: var(--bd); stroke-width: 0.5; }
+.lesson-pipe .diag .rb { fill: var(--s2); stroke: var(--bs); stroke-width: 0.6; }
 .lesson-pipe .diag .row { cursor: pointer; }
-.lesson-pipe .diag .row.sel .rb { fill: var(--s1); stroke: var(--ba); stroke-width: 1.2; }
+.lesson-pipe .diag .row.sel .rb { fill: var(--hl); stroke: var(--ba); stroke-width: 1.2; }
 .lesson-pipe .diag text { fill: var(--tpri); font: 13px ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
 .lesson-pipe .diag .nn { fill: var(--tsec); text-anchor: middle; font-size: 12px; }
 .lesson-pipe .diag .tl { fill: var(--tacc); }
@@ -95,7 +95,7 @@
 .lesson-pipe .pactions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 10px; }
 
 /* how-to */
-.lesson-pipe .ref { margin: 12px 0; border: 0.5px solid var(--bd); border-radius: 12px; padding: 10px 14px; }
+.lesson-pipe .ref { margin: 12px 0; border: 1px solid var(--bd); border-radius: 12px; padding: 10px 14px; }
 .lesson-pipe .ref summary { cursor: pointer; font-weight: 500; }
 .lesson-pipe .ref[open] summary { margin-bottom: 10px; }
 .lesson-pipe .steps { margin: 0; padding: 0 0 0 18px; font-size: 13px; line-height: 1.6; }
@@ -108,3 +108,6 @@
 @media (min-width: 900px) and (min-height: 560px) {
   .lesson-pipe textarea { min-height: 120px; height: 160px; }
 }
+
+.lesson-pipe .tutbtn.on { border-color: var(--ba); }
+.lesson-pipe section[hidden] { display: none; }

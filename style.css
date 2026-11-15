@@ -3,51 +3,53 @@
 /* ---------- theme colours ---------- */
 :root {
   --bg: #ffffff;
-  --s1: #f3f1ea;      /* result cards */
-  --s2: #faf9f6;      /* input boxes' cards */
-  --tpri: #1f1e1c;    /* main text */
-  --tsec: #5f5d58;    /* secondary text */
-  --tacc: #0f6e56;    /* accent text */
-  --tdan: #a32d2d;    /* errors */
-  --bd: rgba(0, 0, 0, .14);
-  --bs: rgba(0, 0, 0, .32);
+  --s1: #ffffff;      /* result blocks: white, separated by a border */
+  --s2: #ffffff;      /* input blocks */
+  --hl: #eef1f4;      /* selected row, hover, highlighted answer */
+  --tpri: #15140f;    /* main text */
+  --tsec: #55534d;    /* secondary text */
+  --tacc: #0b6350;    /* accent text */
+  --tdan: #b02020;    /* errors */
+  --bd: rgba(0, 0, 0, .18);
+  --bs: rgba(0, 0, 0, .42);
   --inbg: #ffffff;
   --btn: #ffffff;
-  --btnh: #efede6;
-  --ring: rgba(29, 158, 117, .28);
-  --ba: #1d9e75;      /* focus / active */
+  --btnh: #eef1f4;
+  --ring: rgba(29, 158, 117, .30);
+  --ba: #138a65;      /* focus / active */
   /* schematic */
-  --boxf: #f4f2ec;    /* chip and processor fill */
-  --boxs: #76746e;    /* chip and processor outline */
+  --boxf: #ffffff;    /* chip and processor fill */
+  --boxs: #5f5d58;    /* chip and processor outline */
   --decf: #e1f5ee;    /* decoder fill */
-  --decs: #0f6e56;    /* decoder outline */
-  --wa: #1d9e75;      /* address wires */
-  --wm: #ba7517;      /* control wires */
-  --wg: #6f6e68;      /* data wires */
+  --decs: #0b6350;    /* decoder outline */
+  --wa: #138a65;      /* address wires */
+  --wm: #9a5c0a;      /* control wires */
+  --wg: #5f5d58;      /* data wires */
   color-scheme: light;
 }
 :root[data-theme="dark"] {
-  --bg: #1c1b19;
-  --s1: #2a2926;
-  --s2: #232220;
-  --tpri: #f0eee8;
-  --tsec: #b4b1a8;
-  --tacc: #5dcaa5;
-  --tdan: #f09595;
-  --bd: rgba(255, 255, 255, .14);
-  --bs: rgba(255, 255, 255, .32);
-  --inbg: #2f2e2b;
-  --btn: #2f2e2b;
-  --btnh: #3b3a36;
-  --ring: rgba(93, 202, 165, .35);
-  --ba: #5dcaa5;
-  --boxf: #2e2d2a;
-  --boxs: #9a978e;
-  --decf: #04342c;
-  --decs: #5dcaa5;
-  --wa: #5dcaa5;
-  --wm: #ef9f27;
-  --wg: #c9c7be;
+  --bg: #000000;      /* deep black */
+  --s1: #1c1c1c;      /* dark gray blocks */
+  --s2: #161616;
+  --hl: #2a2a2a;
+  --tpri: #f4f4f4;
+  --tsec: #b3b3b3;
+  --tacc: #5fdcae;
+  --tdan: #ff8a8a;
+  --bd: rgba(255, 255, 255, .17);
+  --bs: rgba(255, 255, 255, .36);
+  --inbg: #222222;
+  --btn: #222222;
+  --btnh: #313131;
+  --ring: rgba(95, 220, 174, .40);
+  --ba: #5fdcae;
+  --boxf: #1c1c1c;
+  --boxs: #b3b3b3;
+  --decf: #06382e;
+  --decs: #5fdcae;
+  --wa: #5fdcae;
+  --wm: #f2a533;
+  --wg: #cfcfcf;
   color-scheme: dark;
 }
 
@@ -61,7 +63,7 @@ body {
   font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   transition: background .2s, color .2s;
 }
-.app { max-width: 720px; margin: 0 auto; padding: 16px 20px 48px; }
+.app { max-width: 900px; margin: 0 auto; padding: 12px clamp(12px, 4vw, 24px) 48px; }
 p { margin: 0; }
 
 .topbar { display: flex; justify-content: flex-end; margin: 0 0 4px; }
@@ -74,7 +76,7 @@ p { margin: 0; }
   display: flex;
   gap: 2px;
   overflow-x: auto;
-  border-bottom: 0.5px solid var(--bd);
+  border-bottom: 1px solid var(--bd);
   margin: 0 0 18px;
   scrollbar-width: thin;
 }
@@ -89,7 +91,7 @@ button.tab {
   color: var(--tsec);
   white-space: nowrap;
 }
-button.tab:hover { background: var(--s1); color: var(--tpri); }
+button.tab:hover { background: var(--hl); color: var(--tpri); }
 button.tab[aria-selected="true"] { color: var(--tpri); font-weight: 500; border-bottom-color: var(--ba); }
 button.tab:focus-visible { outline-offset: -2px; }
 .panel[hidden] { display: none; }
@@ -98,7 +100,7 @@ button.tab:focus-visible { outline-offset: -2px; }
 input, select, textarea {
   background: var(--inbg);
   color: var(--tpri);
-  border: 0.5px solid var(--bs);
+  border: 1px solid var(--bs);
   border-radius: 8px;
   padding: 6px 8px;
   font: inherit;
@@ -109,7 +111,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--b
 button {
   background: var(--btn);
   color: var(--tpri);
-  border: 0.5px solid var(--bs);
+  border: 1px solid var(--bs);
   border-radius: 8px;
   font: inherit;
   cursor: pointer;
@@ -138,7 +140,7 @@ button:focus-visible { outline: 2px solid var(--ba); outline-offset: 2px; }
 @media (min-width: 900px) and (min-height: 560px) {
   html, body { height: 100%; overflow: hidden; }
   .app {
-    max-width: 1600px;
+    max-width: 1920px;
     height: 100vh;
     height: 100dvh;
     padding: 10px 24px 14px;
@@ -163,9 +165,82 @@ button:focus-visible { outline: 2px solid var(--ba); outline-offset: 2px; }
     gap: 28px;
   }
   .col-a, .col-b { min-height: 0; overflow-y: auto; scrollbar-gutter: stable; padding: 0 4px 16px 0; }
-  .col-a { border-right: 0.5px solid var(--bd); padding-right: 20px; }
+  .col-a { border-right: 1px solid var(--bd); padding-right: 20px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   body { transition: none; }
+}
+
+
+/* ---------- tutorial (shared by every lesson) ---------- */
+.tut .thead { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; margin: 0 0 6px; }
+.tut .tbar { height: 4px; border-radius: 2px; background: var(--bd); margin: 0 0 12px; overflow: hidden; }
+.tut .tbar i { display: block; height: 100%; background: var(--ba); transition: width .2s; }
+.tut .tdone { display: flex; justify-content: space-between; gap: 12px; width: 100%; text-align: left; padding: 7px 12px; margin: 0 0 6px; font-size: 13px; }
+.tut .tdone b { font-weight: 500; }
+.tut .tdone span { color: var(--tacc); overflow-wrap: anywhere; text-align: right; }
+.tut .tstep { background: var(--s2); border: 1px solid var(--bd); border-radius: 12px; padding: 14px 16px; margin: 8px 0; }
+.tut .tstep h4 { margin: 0 0 8px; font-size: 16px; font-weight: 500; }
+.tut .tbody { font-size: 14px; line-height: 1.65; }
+.tut .tbody p { margin: 0 0 8px; }
+.tut .tbody ul { margin: 0 0 8px; padding-left: 20px; }
+.tut .task { margin: 10px 0 8px; font-size: 14px; }
+.tut .tans { margin: 4px 0 8px; padding: 8px 12px; border-left: 3px solid var(--ba); background: var(--hl); border-radius: 0 8px 8px 0; font-size: 15px; }
+.tut .trow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.tut .trow input { flex: 1 1 160px; min-width: 0; }
+.tut .tmsg { min-height: 22px; margin: 6px 0 0; font-size: 13px; }
+.tut .tnav { display: flex; justify-content: space-between; gap: 8px; margin: 10px 0 0; }
+.tut .tnav button:disabled { opacity: .4; cursor: default; }
+.tut .tfin { margin: 10px 0 0; font-size: 13px; }
+.tut .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.tut .okmsg { color: var(--tacc); }
+.tut .bad { color: var(--tdan); }
+.tut .bt { border-collapse: collapse; font-size: 13px; width: 100%; }
+.tut .bt th, .tut .bt td { text-align: left; padding: 4px 10px; border-bottom: 1px solid var(--bd); }
+button.tutbtn.on, .pb.tutbtn.on { border-color: var(--ba); font-weight: 500; }
+
+
+/* ---------- any screen size ---------- */
+html { -webkit-text-size-adjust: 100%; }
+img, svg, video { max-width: 100%; }
+h1, h2, h3, h4, p, li, td, th { overflow-wrap: anywhere; }
+pre, .mono { overflow-wrap: normal; }
+.tabs { scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+button.tab { scroll-snap-align: start; }
+
+/* tablets and small laptops: the two columns still fit side by side */
+@media (min-width: 900px) and (max-width: 1100px) and (min-height: 560px) {
+  .split { gap: 18px; }
+  .app { padding-left: 14px; padding-right: 14px; }
+}
+
+/* phones */
+@media (max-width: 600px) {
+  body { font-size: 15px; }
+  .title h1 { font-size: 19px; }
+  .topbar { margin-bottom: 2px; }
+  button.tab { padding: 10px 12px; font-size: 14px; }
+  input, select, textarea { font-size: 16px; }          /* stops iOS zooming in on focus */
+  .tut .tstep { padding: 12px; }
+  .tut .tdone { flex-direction: column; gap: 2px; }
+  .tut .tdone span { text-align: left; }
+}
+
+/* touch screens: bigger targets */
+@media (pointer: coarse) {
+  button, .pb { min-height: 40px; }
+  button.tab { min-height: 44px; }
+  input, select { height: 40px; }
+  .pb { padding: 6px 12px; }
+}
+
+/* very short windows (phones on their side): stack, do not trap the page in a fixed height */
+@media (max-height: 559px) {
+  html, body { height: auto; overflow: auto; }
+}
+
+@media print {
+  .topbar, .tabs, button { display: none !important; }
+  html, body { height: auto; overflow: visible; }
 }

@@ -22,6 +22,7 @@
       <div class="modes" role="group" aria-label="View">
         <button type="button" class="pb on" data-mode="solution" aria-pressed="true">Solution</button>
         <button type="button" class="pb" data-mode="practice" aria-pressed="false">Practice</button>
+        <button type="button" class="pb tutbtn" data-tut aria-pressed="false">Tutorial</button>
       </div>
     </div>
 
@@ -38,6 +39,8 @@
       <ul class="errs" data-o="errs" role="alert"></ul>
     </section>
     </div><div class="col-b">
+    <section data-o="tutwrap" hidden><div data-o="tut"></div></section>
+
     <section data-view="solution">
       <div data-o="format"></div>
       <div class="keybox" data-o="key"></div>
@@ -94,7 +97,7 @@
     function F(n) { return el.querySelector('[data-f="' + n + '"]'); }
     function O(n) { return el.querySelector('[data-o="' + n + '"]'); }
 
-    var S = { q: QS[0], mode: 'solution', src: 'bits', fields: [] };
+    var S = { q: QS[0], mode: 'solution', tut: false, src: 'bits', fields: [] };
 
     /* ---------- reading the inputs ---------- */
     function readBits() {
@@ -310,8 +313,46 @@
     }
     function clearAll() { S.fields.forEach(function (f) { P(f.id).value = ''; }); clearMarks(); }
 
+    /* ---------- tutorial: work out the address format, then one address ---------- */
+    function tutorialSteps() {
+      var d = readDesign();
+      if (d.error) return [];
+      var cacheTxt = esc(F('cval').value + ' ' + F('cunit').value);
+      var st = [
+        { title: 'What we know', body: '<p>Main memory is byte-addressable with <b>' + d.bits + '</b>-bit addresses. The cache is <b>' + cacheTxt + '</b> with <b>' + d.line + '-byte</b> lines, ' + esc(d.kind) +
+            '.</p><p>Every address splits into three fields: <b>tag | index | byte offset</b>.</p>' },
+        { title: 'Cache lines', type: 'num', value: d.lines, body: '<p>Lines = cache size \u00F7 line size = ' + cacheTxt + ' \u00F7 ' + d.line + ' B.</p>', ask: 'How many cache lines?', hint: 'Convert the cache size to bytes first.' },
+        { title: 'Sets', type: 'num', value: d.sets, body: '<p>Sets = lines \u00F7 ways = ' + d.lines + ' \u00F7 ' + d.ways + '. A direct-mapped cache has 1 way, so sets = lines.</p>', ask: 'How many sets?', hint: 'Lines divided by the number of ways.' },
+        { title: 'Byte offset bits', type: 'num', value: d.offset, body: '<p>The offset picks a byte inside a line: log\u2082(' + d.line + ').</p>', ask: 'How many offset bits?', hint: 'The exponent of the line size.' },
+        { title: 'Index bits', type: 'num', value: d.index, body: '<p>The index picks the set: log\u2082(' + d.sets + ').</p>', ask: 'How many index bits?', hint: 'The exponent of the number of sets.' },
+        { title: 'Tag bits', type: 'num', value: d.tag,
+          body: '<p>The tag is whatever is left: ' + d.bits + ' \u2212 ' + d.index + ' \u2212 ' + d.offset + '.</p><div class="fmt"><div class="seg f-tag" style="flex-grow:' + (d.tag + 3) + '"><b>' + d.tag + '</b><span>Tag</span></div><div class="seg f-idx" style="flex-grow:' + (d.index + 3) + '"><b>' + d.index + '</b><span>Index</span></div><div class="seg f-off" style="flex-grow:' + (d.offset + 3) + '"><b>' + d.offset + '</b><span>Offset</span></div></div>',
+          ask: 'How many tag bits?', hint: 'Address bits \u2212 index \u2212 offset.' }
+      ];
+      var p = L.parseAddr(F('addr').value, d.bits);
+      if (!p.empty && !p.error && !p.wild.length) {
+        var v = L.valueOf(p, {}), sp = L.split(v, d), a = F('addr').value.trim();
+        st.push({ title: 'Set of address 0x' + esc(a.replace(/^0x/i, '')), type: 'num', value: sp.index,
+          body: '<p>Write the address in binary, drop the ' + d.offset + ' offset bits on the right, and read the next ' + d.index + ' bits as a number: that is the set.</p>' + bitRow(L.bitsOf(p, d.bits), d),
+          ask: 'Which set?', hint: 'Convert the ' + d.index + ' index bits to decimal.' });
+        st.push({ title: 'Block of the address', type: 'num', value: sp.block,
+          body: '<p>Block = address \u00F7 line size, rounded down. The address is ' + v + ' in decimal; ' + v + ' \u00F7 ' + d.line + '.</p>', ask: 'Which block?', hint: 'Divide by the line size and drop the remainder.' });
+      }
+      return st;
+    }
+    var tut = Tutorial.mount(O('tut'), { steps: tutorialSteps, mode: function () { return S.mode; }, empty: 'Enter a valid memory, cache and line size to see the steps.' });
+    function setTut(on) {
+      S.tut = on;
+      el.classList.toggle('t-on', on);
+      O('tutwrap').hidden = !on;
+      var b = el.querySelector('[data-tut]');
+      b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on));
+      if (on) tut.refresh();
+    }
+
     function setMode(m) {
       S.mode = m;
+      if (S.tut) tut.refresh();
       el.querySelectorAll('[data-view]').forEach(function (s) { s.hidden = s.getAttribute('data-view') !== m; });
       el.querySelectorAll('[data-mode]').forEach(function (b) {
         var on = b.getAttribute('data-mode') === m;
@@ -326,12 +367,14 @@
       if (f === 'memval' || f === 'memunit') S.src = 'mem';
       else if (f === 'bits') S.src = 'bits';
       update();
+      if (S.tut) tut.refresh();
     });
     el.addEventListener('click', function (e) {
       var b = e.target.closest && e.target.closest('button');
       if (!b || !el.contains(b)) return;
-      if (b.hasAttribute('data-q')) loadQuestion(b.getAttribute('data-q'));
-      else if (b.hasAttribute('data-ways')) { F('ways').value = b.getAttribute('data-ways'); update(); }
+      if (b.hasAttribute('data-tut')) setTut(!S.tut);
+      else if (b.hasAttribute('data-q')) { loadQuestion(b.getAttribute('data-q')); if (S.tut) tut.reset(); }
+      else if (b.hasAttribute('data-ways')) { F('ways').value = b.getAttribute('data-ways'); update(); if (S.tut) tut.refresh(); }
       else if (b.hasAttribute('data-mode')) setMode(b.getAttribute('data-mode'));
       else if (b.getAttribute('data-act') === 'check') check();
       else if (b.getAttribute('data-act') === 'reveal') reveal();
