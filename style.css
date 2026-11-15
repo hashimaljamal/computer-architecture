@@ -259,6 +259,9 @@ button.tab { scroll-snap-align: start; }
 
 /* questions and categories: bold, and the chosen one is filled */
 .pb.qbtn { font-weight: 600; letter-spacing: .01em; }
+.panel .lbar .pb.qbtn { font-size: 15px; }
+@media (min-width: 900px) and (max-width: 1500px) { .panel .lbar .pb.qbtn { font-size: 14px; } }
+@media (max-width: 600px) { .panel .lbar .pb.qbtn { font-size: 14px; } .panel .prompt { font-size: 14.5px !important; } }
 .pb.qbtn.on, .pb.qbtn.on:hover { background: var(--tacc); color: var(--bg); border-color: var(--tacc); }
 .panel .lbar .modes .pb.on { background: var(--hl); border-color: var(--ba); font-weight: 600; }
 
@@ -310,3 +313,51 @@ button.tab { scroll-snap-align: start; }
   .panel .lbar .seg { width: 100%; flex-wrap: nowrap; }
   .panel .lbar .seg .pb { flex: 1 1 auto; font-size: 12px; padding: 6px 5px; }
 }
+@media (max-width: 600px) { .panel .lbar .seg .pb.qbtn { font-size: 12px; } }
+
+/* ---------- the Lesson pop-up (guide.js) ---------- */
+html.g-open, html.g-open body { overflow: hidden; }
+.gmodal { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.gmodal[hidden] { display: none; }
+.gback { position: absolute; inset: 0; background: rgba(0, 0, 0, .6); }
+.gcard { position: relative; display: flex; flex-direction: column; width: min(940px, 100%); max-height: calc(100dvh - 48px);
+  background: var(--bg); color: var(--tpri); border: 1px solid var(--bs); border-radius: 14px; box-shadow: 0 20px 60px rgba(0, 0, 0, .45); }
+.ghead { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 22px; border-bottom: 1px solid var(--bd); }
+.ghead h2 { margin: 0; font-size: 19px; font-weight: 600; }
+.gtoc { flex: none; display: flex; gap: 6px; overflow-x: auto; overflow-y: hidden; padding: 10px 22px; border-bottom: 1px solid var(--bd); scrollbar-width: thin; }
+.gtoc .pb { flex: none; font-size: 13px; line-height: 1.3; padding: 5px 12px; border-radius: 999px; white-space: nowrap; }
+.gmodal .gbody { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 6px 26px 30px; font-size: 15px; line-height: 1.7; }
+.gmodal .gbody:focus { outline: none; }
+.gmodal .gbody h3 { font-size: 18px; font-weight: 600; margin: 26px 0 8px; padding-top: 4px; scroll-margin-top: 6px; }
+.gmodal .gbody h3:first-child { margin-top: 14px; }
+.gmodal .gbody h4 { font-size: 15px; font-weight: 600; margin: 16px 0 6px; }
+.gmodal .gbody p { margin: 0 0 10px; }
+.gmodal .gbody ul, .gmodal .gbody ol { margin: 0 0 12px; padding-left: 22px; }
+.gmodal .gbody li { margin: 0 0 4px; }
+.gmodal .gbody .mono, .gmodal .gbody code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .93em; }
+.gmodal .gbody code { background: var(--hl); padding: 1px 5px; border-radius: 5px; }
+.gmodal .gbody .gfig { border: 1px solid var(--bd); border-radius: 10px; padding: 12px 14px; margin: 8px 0 14px; background: var(--s2); overflow-x: auto; }
+.gmodal .gbody .gcap { font-size: 13px; color: var(--tsec); margin: 8px 0 0; line-height: 1.5; }
+.gmodal .gbody .gtable { border-collapse: collapse; font-size: 14px; margin: 6px 0 14px; }
+.gmodal .gbody .gtable th, .gmodal .gbody .gtable td { border: 1px solid var(--bd); padding: 4px 10px; text-align: left; vertical-align: top; }
+.gmodal .gbody .gtable th { background: var(--hl); font-weight: 600; }
+.gmodal .gbody .gtable.mono td { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.gmodal .gbody .gkey { border-left: 4px solid var(--ba); background: var(--hl); padding: 10px 14px; border-radius: 0 10px 10px 0; margin: 8px 0 14px; }
+.gmodal .gbody .gkey.warn { border-left-color: var(--wm); }
+.gmodal .gbody .gkey p:last-child, .gmodal .gbody .gkey ul:last-child, .gmodal .gbody .gkey ol:last-child { margin-bottom: 0; }
+.gmodal .gbody .gform { display: block; text-align: center; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 15px; font-weight: 600;
+  background: var(--hl); border-radius: 8px; padding: 8px 12px; margin: 6px 0 12px; }
+.gmodal .gbody .gsteps > li { margin-bottom: 8px; }
+.gmodal .gbody .gtwo { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.gmodal .gbody svg { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+@media (max-width: 600px) {
+  .gmodal { padding: 0; }
+  .gcard { width: 100%; height: 100dvh; max-height: 100dvh; border-radius: 0; border: none; }
+  .ghead { padding: 10px 14px; }
+  .ghead h2 { font-size: 16px; }
+  .gtoc { padding: 8px 14px; }
+  .gbody { padding: 4px 16px 24px; font-size: 14.5px; }
+}
+.pb.lessonbtn { font-weight: 600; }
+
+.gmodal .gfig.wide svg { min-width: 560px; }

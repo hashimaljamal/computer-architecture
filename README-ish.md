@@ -61,7 +61,7 @@ How the design works:
 
 ### Cache
 
-- **Q1 to Q8** load the eight practice questions. Every box is editable (memory size or address bits, cache size, bytes per line, ways), so you can try your own cache. Type the memory size *or* the address bits and the other follows. Questions with several designs (Q2 to Q5) get buttons to switch between direct-mapped and the associative versions.
+- **Q1 to Q8** load the eight practice questions. Every box is editable (memory size or address bits, cache size, bytes per line, ways), so you can try your own cache. Type the memory size *or* the address bits and the other follows. Questions with several designs (Q2 to Q5) list them in the Ways box (`1, 4, 8`) and every design is solved side by side.
 - The working shows cache lines, sets, offset, index and tag bits, and draws the address format.
 - **Where does an address go?** Enter a hex address to see it in binary, split into tag, index and offset, with its set number and block number.
 - **Same set, unknown digits** takes two addresses with unknown hex digits (`X`, `Y`, `Z`) and lists the values that put both in the same set. If the digits depend on each other it lists the working combinations.
@@ -77,6 +77,14 @@ Each lesson has a **Tutorial** button next to Solution and Practice. It walks th
 - **Practice** mode: you type the answer for each step. Check marks it (with a hint if wrong) and Next unlocks once it is right, or press Show answer.
 - Memory: separate tutorials for RAM chips, the block address map, and bus / address width. LC-3: pick any instruction from the list and encode it field by field. Pipelining: reads and writes, then each instruction's dependencies. Cache: lines, sets, offset, index and tag bits, then the set and block of the address.
 - The engine is `tutorial.js`; a lesson only supplies a list of steps (see the header comment in that file).
+
+### Lesson button (every lesson)
+
+**Lesson** (next to Tutorial) opens a pop-up with the whole topic: every concept, formulas, pictures and a fully worked example, with a contents bar to jump between sections. The examples and pictures are produced by the same code as the solver, so their numbers always agree with it. Esc or Close shuts it. Content lives in `lessons/<lesson>/guide.js`; the pop-up itself is `guide.js`.
+
+### Cache: several designs at once
+
+Questions that ask for direct-mapped, 4-way and 8-way (Q2 to Q5) are solved together: the **Ways** box holds a list such as `1, 4, 8`, the shared working (lines, offset) is shown once, and each design gets its own card (a), (b), (c) with its working, address format and key check. The address and unknown-digit tools also answer for every listed design. Type a single number for one design.
 
 ### Memory system design: Solution, Practice, three problem types
 
@@ -131,6 +139,7 @@ index.html                     page shell and the list of lessons
 style.css                      colours, page, tabs, and shared controls
 shell.js                       tabs, theme toggle, lesson registry
 tutorial.js                    the step-by-step tutorial engine used by every lesson
+guide.js                       the Lesson pop-up (each lesson's content is in lessons/<lesson>/guide.js)
 lessons/
   memory-design/
     memory-design.js           the lesson's page (builds its panel)
@@ -161,6 +170,7 @@ tests/
   tutorial.test.js             tests for answer checking in the tutorial engine
   memory-blocks.test.js        tests for the block map and bus / address-width math
   memory-questions.test.js     tests for Ex 1 to Ex 7 answers and tutorials
+  guides.test.js               every Lesson pop-up builds, with the right worked numbers
   memory-design.test.js        tests for the Memory design lesson
   lc3-encoding.test.js         tests for the LC-3 encoding lesson
   pipelining.test.js           tests for the Pipelining lesson

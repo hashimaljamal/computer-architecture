@@ -57,7 +57,7 @@
 .lesson-memory.m-solution [data-only="pracres"], .lesson-memory.t-on [data-only="pracres"],
 .lesson-memory:not(.t-on) [data-only="tutres"],
 .lesson-memory.m-solution:not(.t-on) [data-only="prompt"] { display: none; }
-.lesson-memory .prompt { font-size: 13px; color: var(--tsec); margin: 0 0 12px; line-height: 1.6; }
+.lesson-memory .prompt { font-size: 15px; line-height: 1.65; color: var(--tpri); margin: 0 0 14px; padding: 10px 14px; background: var(--s2); border: 1px solid var(--bd); border-left: 4px solid var(--ba); border-radius: 0 10px 10px 0; }
 .lesson-memory .pgroup { border: 1px solid var(--bd); border-radius: 8px; margin: 0 0 12px; padding: 6px 12px 10px; }
 .lesson-memory .pgroup legend { font-size: 13px; color: var(--tsec); padding: 0 6px; }
 .lesson-memory .prow { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px 14px; }
@@ -80,3 +80,10 @@
 .lesson-memory .two { gap: 10px; }
 .lesson-memory .ctl input { width: 96px; }
 @media (max-width: 380px) { .lesson-memory .card .f { grid-template-columns: 1fr; } }
+
+/* chip grid picture in the Lesson pop-up */
+.lesson-memory .gchips { display: grid; gap: 6px; align-items: center; justify-content: start; font-size: 12px; }
+.lesson-memory .gchip { border: 1.5px solid var(--boxs); background: var(--boxf); border-radius: 6px; text-align: center; padding: 6px 4px; font-weight: 600; line-height: 1.25; }
+.lesson-memory .gchip small { font-weight: 400; color: var(--tsec); }
+.lesson-memory .gcol { text-align: center; color: var(--wg); font-family: ui-monospace, Menlo, Consolas, monospace; }
+.lesson-memory .grow { color: var(--wm); font-weight: 600; padding-right: 4px; }

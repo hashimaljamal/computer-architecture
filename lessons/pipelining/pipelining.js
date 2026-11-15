@@ -14,6 +14,7 @@
         <button type="button" class="pb on" data-mode="solution" aria-pressed="true">Solution</button>
         <button type="button" class="pb" data-mode="practice" aria-pressed="false">Practice</button>
         <button type="button" class="pb tutbtn" data-tut aria-pressed="false">Tutorial</button>
+        <button type="button" class="pb lessonbtn" data-lesson aria-haspopup="dialog">Lesson</button>
       </div>
     </div>
     <div class="split"><div class="col-a">
